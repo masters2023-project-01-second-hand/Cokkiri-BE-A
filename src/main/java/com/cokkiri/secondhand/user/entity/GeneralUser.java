@@ -56,4 +56,8 @@ public class GeneralUser {
 	public void encodePassword(PasswordEncoder passwordEncoder) {
 		this.password = passwordEncoder.encode(this.password);
 	}
+
+	public boolean validatePassword(String password, PasswordEncoder passwordEncoder) {
+		return passwordEncoder.matches(password, this.password);
+	}
 }
