@@ -39,7 +39,7 @@ public class SecurityConfig {
 			.and()
 
 			.authorizeRequests()
-			.antMatchers("/api/auth/signup").permitAll()
+			.antMatchers("/api/auth/signup", "/api/auth/login").permitAll()
 			.anyRequest().authenticated();
 
 		http.addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class);
