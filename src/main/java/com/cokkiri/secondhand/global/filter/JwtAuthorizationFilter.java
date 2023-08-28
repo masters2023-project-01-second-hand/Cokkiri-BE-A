@@ -1,6 +1,7 @@
 package com.cokkiri.secondhand.global.filter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,6 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,6 +44,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	private final JwtTokenGenerator jwtTokenGenerator;
 	private final ObjectMapper objectMapper;
 
+	private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
@@ -60,8 +69,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		try {
 			String token = getAccessToken(httpServletRequest);
 			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserForJwtBy(token);
+			SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
 
-			request.setAttribute("memberId", userInfoForJwt);
+			request.setAttribute("userInfoForJwt", userInfoForJwt);
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
@@ -98,6 +108,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 					.badRequest()
 					.body(new ErrorMessageResponse(e.getMessage()))
 			)
+		);
+	}
+
+	public Authentication getAuthentication(UserInfoForJwt userInfoForJwt) {
+
+		UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+			.username(userInfoForJwt.getId())
+			.password(UUID.randomUUID().toString())
+			.roles(userInfoForJwt.getUserType().name())
+			.build();
+
+		return new UsernamePasswordAuthenticationToken(
+			userDetailsUser,
+			null,
+			authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities())
 		);
 	}
 }

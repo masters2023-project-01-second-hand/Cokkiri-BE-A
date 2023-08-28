@@ -2,6 +2,8 @@ package com.cokkiri.secondhand.global.auth.domain;
 
 import java.util.Map;
 
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+
 import com.cokkiri.secondhand.user.entity.GeneralUser;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +25,15 @@ public class UserInfoForJwt {
 		return new UserInfoForJwt(
 			String.valueOf(user.getId()),
 			UserType.GENERAL
+		);
+	}
+
+	public static UserInfoForJwt from(DefaultOAuth2User defaultOAuth2User) {
+		Map<String, Object> attributes = defaultOAuth2User.getAttributes();
+
+		return new UserInfoForJwt(
+			String.valueOf(attributes.get("id")),
+			UserType.OAUTH
 		);
 	}
 

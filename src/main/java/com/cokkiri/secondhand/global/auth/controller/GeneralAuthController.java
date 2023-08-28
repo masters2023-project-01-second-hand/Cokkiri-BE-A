@@ -3,6 +3,7 @@ package com.cokkiri.secondhand.global.auth.controller;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,5 +36,10 @@ public class GeneralAuthController {
 		generalAuthService.signUp(signUpRequest);
 
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/lol")
+	public ResponseEntity<String> sdfs() {
+		return ResponseEntity.ok("sdfsdfsdf");
 	}
 }

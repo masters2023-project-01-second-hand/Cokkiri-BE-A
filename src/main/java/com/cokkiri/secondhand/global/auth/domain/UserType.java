@@ -1,7 +1,7 @@
 package com.cokkiri.secondhand.global.auth.domain;
 
 public enum UserType {
-	NONE, GENERAL, GITHUB;
+	NONE, GENERAL, OAUTH;
 
 	public static UserType getUserTypeBy(String name) {
 		for(UserType type : UserType.values()) {
