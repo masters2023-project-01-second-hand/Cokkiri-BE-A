@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.auth.domain;
+package com.cokkiri.secondhand.global.auth.entity;
 
 public enum UserType {
 	NONE, GENERAL, OAUTH;
