@@ -1,6 +1,8 @@
-package com.cokkiri.secondhand.global.auth.jwt;
+package com.cokkiri.secondhand.global.auth.infrastructure;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
@@ -8,8 +10,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.cokkiri.secondhand.global.auth.domain.UserInfoForJwt;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
+import com.cokkiri.secondhand.global.auth.entity.JwtAccessToken;
+import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.IllegalJwtTokenException;
 
 import io.jsonwebtoken.Claims;
@@ -31,6 +35,7 @@ public class JwtTokenGenerator implements InitializingBean  {
 	private Key secretKey;
 
 	public JwtTokenGenerator(
+		MemoryJwtRepository memoryJwtRepository,
 		@Value("${jwt.secret}") String SECRET,
 		@Value("${jwt.access.expiration-time-in-milli-seconds}") Long ACCESS_EXPIRATION_TIME,
 		@Value("${jwt.refresh.expiration-time-in-milli-seconds}") Long REFRESH_EXPIRATION_TIME,
@@ -50,9 +55,14 @@ public class JwtTokenGenerator implements InitializingBean  {
 	}
 
 	public JwtTokenResponse createJwtTokenResponse(UserInfoForJwt user) {
+		JwtAccessToken accessToken = createAccessToken(user);
+		JwtRefreshToken refreshToken = createRefreshToken();
+
 		return new JwtTokenResponse(
-			createAccessToken(user),
-			createRefreshToken()
+			accessToken.getAccessToken(),
+			accessToken.getExpirationDateTime(),
+			refreshToken.getRefreshToken(),
+			refreshToken.getExpirationDateTime()
 		);
 	}
 
@@ -84,12 +94,20 @@ public class JwtTokenGenerator implements InitializingBean  {
 		throw new IllegalJwtTokenException(errorMessage);
 	}
 
-	private String createAccessToken(UserInfoForJwt user) {
-		return createToken(ACCESS_SUBJECT, user.generateClaims(), getAccessExpirationDate());
+	private JwtAccessToken createAccessToken(UserInfoForJwt user) {
+		Date expirationDate = getAccessExpirationDate();
+		return new JwtAccessToken(
+			createToken(ACCESS_SUBJECT, user.generateClaims(), expirationDate),
+			convertToDateTime(expirationDate)
+		);
 	}
 
-	private String createRefreshToken() {
-		return createToken(REFRESH_SUBJECT, Map.of(), getRefreshExpirationDate());
+	private JwtRefreshToken createRefreshToken() {
+		Date expirationDate = getRefreshExpirationDate();
+		return new JwtRefreshToken(
+			createToken(REFRESH_SUBJECT, Map.of(), expirationDate),
+			convertToDateTime(expirationDate)
+		);
 	}
 
 	private String createToken(String subject, Map<String, String> claims, Date expirationDate) {
@@ -108,5 +126,11 @@ public class JwtTokenGenerator implements InitializingBean  {
 
 	private Date getRefreshExpirationDate() {
 		return new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME);
+	}
+
+	private LocalDateTime convertToDateTime(Date date) {
+		return date.toInstant() // Date -> Instant
+			.atZone(ZoneId.systemDefault()) // Instant -> ZonedDateTime
+			.toLocalDateTime();
 	}
 }

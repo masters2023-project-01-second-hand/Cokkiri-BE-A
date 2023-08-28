@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.auth.oauth;
+package com.cokkiri.secondhand.global.auth.service;
 
 import java.util.Collections;
 import java.util.Map;
@@ -12,6 +12,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import com.cokkiri.secondhand.global.auth.entity.OAuthType;
+import com.cokkiri.secondhand.global.auth.entity.UserInfoFromOauthServer;
 import com.cokkiri.secondhand.user.entity.GitHubUser;
 import com.cokkiri.secondhand.user.repository.GitHubUserRepository;
 

@@ -1,5 +1,9 @@
 package com.cokkiri.secondhand.global.auth.dto.response;
 
+import java.time.LocalDateTime;
+
+import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +12,16 @@ import lombok.Getter;
 public class JwtTokenResponse {
 
 	private String accessToken;
+	private LocalDateTime expirationAccessTokenDateTime;
 	private String refreshToken;
+	private LocalDateTime expirationRefreshTokenDateTime;
+
+	public JwtRefreshToken toRefreshToken() {
+		return new JwtRefreshToken(
+			refreshToken,
+			expirationRefreshTokenDateTime
+		);
+	}
+
+
 }

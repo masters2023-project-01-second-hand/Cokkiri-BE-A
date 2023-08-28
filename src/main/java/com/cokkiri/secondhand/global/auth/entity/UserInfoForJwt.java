@@ -1,6 +1,7 @@
-package com.cokkiri.secondhand.global.auth.domain;
+package com.cokkiri.secondhand.global.auth.entity;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
@@ -39,5 +40,20 @@ public class UserInfoForJwt {
 
 	public Map<String, String> generateClaims() {
 		return Map.of("id", id, "userType", userType.name());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		UserInfoForJwt that = (UserInfoForJwt)o;
+		return Objects.equals(id, that.id) && userType == that.userType;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, userType);
 	}
 }

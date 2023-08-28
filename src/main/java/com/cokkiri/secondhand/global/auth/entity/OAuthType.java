@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.auth.oauth;
+package com.cokkiri.secondhand.global.auth.entity;
 
 import java.util.Arrays;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.auth.oauth;
+package com.cokkiri.secondhand.global.auth.handler;
 
 import java.io.IOException;
 

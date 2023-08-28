@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.auth.oauth;
+package com.cokkiri.secondhand.global.auth.entity;
 
 import com.cokkiri.secondhand.user.entity.GitHubUser;
 import com.cokkiri.secondhand.user.entity.Role;

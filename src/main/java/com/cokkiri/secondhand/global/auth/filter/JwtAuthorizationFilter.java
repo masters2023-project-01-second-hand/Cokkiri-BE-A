@@ -1,32 +1,28 @@
-package com.cokkiri.secondhand.global.filter;
+package com.cokkiri.secondhand.global.auth.filter;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.cokkiri.secondhand.global.auth.domain.UserInfoForJwt;
-import com.cokkiri.secondhand.global.auth.jwt.JwtTokenGenerator;
-import com.cokkiri.secondhand.global.exception.ErrorMessageResponse;
-import com.cokkiri.secondhand.global.exception.NotExistAccessTokenException;
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.global.auth.infrastructure.JwtAuthHttpResponseManager;
+import com.cokkiri.secondhand.global.auth.infrastructure.JwtTokenGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -38,9 +34,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	@Value("${jwt.whitelist}")
 	private String[] whiteListUrls;
 
-	@Value("${jwt.access.http-header}")
-	private String accessHttpHeader;
-
+	private final JwtAuthHttpResponseManager jwtAuthHttpResponseManager;
 	private final JwtTokenGenerator jwtTokenGenerator;
 	private final ObjectMapper objectMapper;
 
@@ -61,13 +55,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		if (!isContainAccessToken(httpServletRequest)) {
-			sendNotExistAccessTokenException(response);
+		if (!jwtAuthHttpResponseManager.isContainAccessToken(httpServletRequest)) {
+			jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
 			return;
 		}
 
 		try {
-			String token = getAccessToken(httpServletRequest);
+			String token = jwtAuthHttpResponseManager.getAccessToken(httpServletRequest);
 			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserForJwtBy(token);
 			SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
 
@@ -75,7 +69,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			sendErrorResponseEntity(response, new RuntimeException(e));
+			jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
 		}
 	}
 
@@ -83,37 +77,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		return PatternMatchUtils.simpleMatch(whiteListUrls, uri);
 	}
 
-	private boolean isContainAccessToken(HttpServletRequest request) {
-		String authorization = request.getHeader("Authorization");
-		return authorization != null && authorization.startsWith("Bearer ");
-	}
-
-	private String getAccessToken(HttpServletRequest request) {
-		String authorization = request.getHeader(accessHttpHeader);
-		return authorization.substring(7).replace("\"", "");
-	}
-
-	private void sendNotExistAccessTokenException(ServletResponse response) throws IOException {
-		sendErrorResponseEntity(response, new NotExistAccessTokenException());
-	}
-
-	private void sendErrorResponseEntity(ServletResponse response, RuntimeException e) throws IOException {
-		response.setCharacterEncoding("UTF-8");
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		((HttpServletResponse)response).setStatus(HttpStatus.UNAUTHORIZED.value());
-
-		response.getWriter().write(
-			objectMapper.writeValueAsString(
-				ResponseEntity
-					.badRequest()
-					.body(new ErrorMessageResponse(e.getMessage()))
-			)
-		);
-	}
-
 	public Authentication getAuthentication(UserInfoForJwt userInfoForJwt) {
 
-		UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
+		UserDetails userDetailsUser = User.builder()
 			.username(userInfoForJwt.getId())
 			.password(UUID.randomUUID().toString())
 			.roles(userInfoForJwt.getUserType().name())

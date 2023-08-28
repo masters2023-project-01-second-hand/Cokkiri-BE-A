@@ -1,4 +1,4 @@
-package com.cokkiri.secondhand.global.config;
+package com.cokkiri.secondhand.global.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
-import com.cokkiri.secondhand.global.auth.jwt.JwtTokenGenerator;
-import com.cokkiri.secondhand.global.auth.oauth.OAuthLoginFailureHandler;
-import com.cokkiri.secondhand.global.auth.oauth.OAuthLoginSuccessHandler;
-import com.cokkiri.secondhand.global.auth.oauth.OAuthService;
-import com.cokkiri.secondhand.global.filter.JwtAuthorizationFilter;
+import com.cokkiri.secondhand.global.auth.infrastructure.JwtTokenGenerator;
+import com.cokkiri.secondhand.global.auth.handler.OAuthLoginFailureHandler;
+import com.cokkiri.secondhand.global.auth.handler.OAuthLoginSuccessHandler;
+import com.cokkiri.secondhand.global.auth.service.OAuthService;
+import com.cokkiri.secondhand.global.auth.filter.JwtAuthorizationFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,9 @@ public class SecurityConfig {
 			.and()
 
 			.authorizeRequests()
-			.antMatchers("/api/auth/signup", "/api/auth/login").permitAll()
+			.antMatchers("/api/auth/signup",
+				"/api/auth/login",
+				"/api/auth/reissue-access-token").permitAll()
 			.anyRequest().authenticated()
 			.and()
 

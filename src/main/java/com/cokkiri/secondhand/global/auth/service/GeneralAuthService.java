@@ -4,11 +4,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cokkiri.secondhand.global.auth.domain.UserInfoForJwt;
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
-import com.cokkiri.secondhand.global.auth.jwt.JwtTokenGenerator;
+import com.cokkiri.secondhand.global.auth.infrastructure.JwtTokenGenerator;
+import com.cokkiri.secondhand.global.auth.infrastructure.MemoryJwtRepository;
 import com.cokkiri.secondhand.global.exception.LoginFailureException;
 import com.cokkiri.secondhand.global.exception.NicknameDuplicationException;
 import com.cokkiri.secondhand.global.exception.UsernameDuplicationException;
@@ -23,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class GeneralAuthService {
 
+	private final JwtTokenService jwtTokenService;
 	private final GeneralUserRepository generalUserRepository;
-	private final JwtTokenGenerator jwtTokenGenerator;
 	private final PasswordEncoder passwordEncoder;
 
 	public JwtTokenResponse logIn(GeneralLogInRequest logInRequest) {
@@ -36,7 +37,7 @@ public class GeneralAuthService {
 			throw new LoginFailureException();
 		}
 
-		return jwtTokenGenerator.createJwtTokenResponse(UserInfoForJwt.from(user));
+		return jwtTokenService.issueTokens(UserInfoForJwt.from(user));
 	}
 
 	public void signUp(GeneralSignUpRequest signUpRequest) {

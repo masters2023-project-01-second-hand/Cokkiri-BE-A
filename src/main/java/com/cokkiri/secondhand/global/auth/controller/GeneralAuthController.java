@@ -1,5 +1,6 @@
 package com.cokkiri.secondhand.global.auth.controller;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
+import com.cokkiri.secondhand.global.auth.infrastructure.JwtAuthHttpResponseManager;
 import com.cokkiri.secondhand.global.auth.service.GeneralAuthService;
 
 import lombok.AllArgsConstructor;
@@ -19,14 +21,19 @@ import lombok.AllArgsConstructor;
 @RestController
 public class GeneralAuthController {
 
+	private final JwtAuthHttpResponseManager jwtAuthHttpResponseManager;
 	private final GeneralAuthService generalAuthService;
 
 	@PostMapping("/api/auth/login")
 	public ResponseEntity<JwtTokenResponse> login(
-		@RequestBody @Valid GeneralLogInRequest signInRequest) {
+		@RequestBody @Valid GeneralLogInRequest signInRequest,
+		HttpServletResponse response) {
 
-		return ResponseEntity.ok(
-			generalAuthService.logIn(signInRequest));
+		JwtTokenResponse jwtTokenResponse = generalAuthService.logIn(signInRequest);
+
+		jwtAuthHttpResponseManager.setAuthHttpResponse(response, jwtTokenResponse);
+
+		return ResponseEntity.ok(jwtTokenResponse);
 	}
 
 	@PostMapping("/api/auth/signup")
