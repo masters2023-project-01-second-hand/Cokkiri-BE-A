@@ -21,7 +21,7 @@ public class JwtTokenController {
 	private final JwtAuthHttpResponseManager jwtAuthHttpResponseManager;
 	private final JwtTokenService jwtTokenService;
 
-	@PostMapping("/api/auth/reissue-access-token")
+	@PostMapping("/api/reissue-access-token")
 	public ResponseEntity<JwtTokenResponse> reissueAccessToken(
 		@RequestBody RefreshTokenRequest refreshTokenRequest,
 		HttpServletResponse response) {

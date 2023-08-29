@@ -24,7 +24,7 @@ public class GeneralAuthController {
 	private final JwtAuthHttpResponseManager jwtAuthHttpResponseManager;
 	private final GeneralAuthService generalAuthService;
 
-	@PostMapping("/api/auth/login")
+	@PostMapping("/api/login")
 	public ResponseEntity<JwtTokenResponse> login(
 		@RequestBody @Valid GeneralLogInRequest signInRequest,
 		HttpServletResponse response) {
@@ -36,7 +36,7 @@ public class GeneralAuthController {
 		return ResponseEntity.ok(jwtTokenResponse);
 	}
 
-	@PostMapping("/api/auth/signup")
+	@PostMapping("/api/users")
 	public ResponseEntity<Void> signUp(
 		@RequestBody @Valid GeneralSignUpRequest signUpRequest) {
 

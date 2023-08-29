@@ -4,12 +4,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
-import com.cokkiri.secondhand.global.auth.infrastructure.JwtTokenGenerator;
-import com.cokkiri.secondhand.global.auth.infrastructure.MemoryJwtRepository;
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.LoginFailureException;
 import com.cokkiri.secondhand.global.exception.NicknameDuplicationException;
 import com.cokkiri.secondhand.global.exception.UsernameDuplicationException;

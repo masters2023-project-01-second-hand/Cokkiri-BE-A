@@ -55,7 +55,7 @@ public class JwtAuthHttpResponseManager {
 
 	public String getAccessToken(HttpServletRequest request) {
 		String authorization = request.getHeader(ACCESS_HTTP_HEADER);
-		return authorization.replace(ACCESS_HTTP_HEADER, "");
+		return authorization.replace(AUTHORIZATION_TYPE, "");
 	}
 
 	public void sendNotExistAccessTokenException(ServletResponse response, ObjectMapper objectMapper) throws IOException {

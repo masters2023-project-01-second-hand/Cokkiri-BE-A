@@ -50,12 +50,12 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 	}
 
 	private GitHubUser saveOrUpdate(UserInfoFromOauthServer userInfo) {
-		GitHubUser user = gitHUbUserRepository.findByOauthId(userInfo.getOauthId())
-			.map(u -> u.update(
+		GitHubUser gitHubUser = gitHUbUserRepository.findByOauthId(userInfo.getOauthId())
+			.map(user -> user.update(
 				userInfo.getOauthId(),
-				userInfo.getName(),
+				userInfo.getNickname(),
 				userInfo.getImageUrl()))
 			.orElse(userInfo.toGitHubUser());
-		return gitHUbUserRepository.save(user);
+		return gitHUbUserRepository.save(gitHubUser);
 	}
 }

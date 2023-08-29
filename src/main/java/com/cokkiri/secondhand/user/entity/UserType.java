@@ -1,7 +1,7 @@
-package com.cokkiri.secondhand.global.auth.entity;
+package com.cokkiri.secondhand.user.entity;
 
 public enum UserType {
-	NONE, GENERAL, OAUTH;
+	NONE, GENERAL, GITHUB;
 
 	public static UserType getUserTypeBy(String name) {
 		for(UserType type : UserType.values()) {

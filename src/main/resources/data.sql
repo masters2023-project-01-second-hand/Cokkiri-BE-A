@@ -1,1 +1,2 @@
-INSERT INTO user(username, nickname, password, role) VALUES ("admin", "adminnn", "$2a$10$MHM1urg21sP7yUQcgUNCfubE8Efb61jqINWyyoCzItIos/ZvLP2Uu", "USER");
+INSERT INTO user(nickname, role, user_type) VALUES ("admin_nick", "USER", "GENERAL");
+INSERT INTO general_user(user_id, username, password) VALUES (1, "admin", "$2a$10$MHM1urg21sP7yUQcgUNCfubE8Efb61jqINWyyoCzItIos/ZvLP2Uu");

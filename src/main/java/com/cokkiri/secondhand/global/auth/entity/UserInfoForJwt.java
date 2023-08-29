@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import com.cokkiri.secondhand.user.entity.GeneralUser;
+import com.cokkiri.secondhand.user.entity.UserType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class UserInfoForJwt {
 
 		return new UserInfoForJwt(
 			String.valueOf(attributes.get("id")),
-			UserType.OAUTH
+			UserType.GITHUB
 		);
 	}
 

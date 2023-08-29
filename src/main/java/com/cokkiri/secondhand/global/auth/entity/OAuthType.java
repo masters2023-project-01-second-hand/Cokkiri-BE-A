@@ -9,7 +9,7 @@ public enum OAuthType {
 	GITHUB("github", (attributes) -> {
 		return new UserInfoFromOauthServer(
 			String.valueOf(attributes.get("id")),
-			(String) attributes.get("name"),
+			(String) attributes.get("login"),
 			(String) attributes.get("avatar_url")
 		);
 	});
