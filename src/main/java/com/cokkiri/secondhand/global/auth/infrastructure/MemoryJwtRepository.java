@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
-import com.cokkiri.secondhand.global.exception.NotExistRefreshTokenException;
+import com.cokkiri.secondhand.global.exception.list.NotExistRefreshTokenException;
 
 @Repository
 public class MemoryJwtRepository { // TODO: 추후 Redis로 변경하기

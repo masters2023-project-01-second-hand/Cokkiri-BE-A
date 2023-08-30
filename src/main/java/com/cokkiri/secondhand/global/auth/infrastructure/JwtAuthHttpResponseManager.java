@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
 import com.cokkiri.secondhand.global.exception.ErrorMessageResponse;
-import com.cokkiri.secondhand.global.exception.NotExistAccessTokenException;
+import com.cokkiri.secondhand.global.exception.list.NotExistAccessTokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component

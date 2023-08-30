@@ -14,7 +14,7 @@ import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
 import com.cokkiri.secondhand.global.auth.entity.JwtAccessToken;
 import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
-import com.cokkiri.secondhand.global.exception.IllegalJwtTokenException;
+import com.cokkiri.secondhand.global.exception.list.IllegalJwtTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

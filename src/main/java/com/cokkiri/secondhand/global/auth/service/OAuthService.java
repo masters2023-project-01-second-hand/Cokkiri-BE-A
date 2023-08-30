@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.cokkiri.secondhand.global.auth.entity.OAuthType;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoFromOauthServer;
-import com.cokkiri.secondhand.global.exception.NotExistLocationException;
+import com.cokkiri.secondhand.global.exception.list.NotExistLocationException;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GitHubUser;
