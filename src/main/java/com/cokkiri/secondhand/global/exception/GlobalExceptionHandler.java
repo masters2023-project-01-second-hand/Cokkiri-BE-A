@@ -30,4 +30,13 @@ public class GlobalExceptionHandler {
 			.body(new ErrorMessageResponse(e.getMessage()));
 	}
 
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorMessageResponse> handleException(Exception e) {
+		LOGGER.error(CONSOLE_MESSAGE, e);
+
+		return ResponseEntity
+			.internalServerError()
+			.body(new ErrorMessageResponse(e.getMessage()));
+	}
+
 }
