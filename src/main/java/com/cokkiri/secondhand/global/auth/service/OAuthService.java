@@ -16,11 +16,11 @@ import com.cokkiri.secondhand.global.auth.entity.OAuthType;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoFromOauthServer;
 import com.cokkiri.secondhand.global.exception.NotExistLocationException;
 import com.cokkiri.secondhand.item.entity.Location;
-import com.cokkiri.secondhand.item.repository.LocationRepository;
+import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GitHubUser;
 import com.cokkiri.secondhand.user.entity.MyLocation;
-import com.cokkiri.secondhand.user.repository.GitHubUserRepository;
-import com.cokkiri.secondhand.user.repository.MyLocationRepository;
+import com.cokkiri.secondhand.user.repository.GitHubUserJpaRepository;
+import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-	private final GitHubUserRepository gitHUbUserRepository;
-	private final LocationRepository locationRepository;
-	private final MyLocationRepository myLocationRepository;
+	private final GitHubUserJpaRepository gitHUbUserJpaRepository;
+	private final LocationJpaRepository locationJpaRepository;
+	private final MyLocationJpaRepository myLocationJpaRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -49,7 +49,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
 		GitHubUser gitHubUser = saveOrUpdate(userInfo);
 
-		Location location = locationRepository.findByName(Location.getDefaultName())
+		Location location = locationJpaRepository.findByName(Location.getDefaultName())
 			.orElseThrow(() -> new NotExistLocationException(Location.getDefaultName()));
 
 		MyLocation myLocation = MyLocation.builder()
@@ -57,7 +57,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 			.user(gitHubUser)
 			.isSelected(Boolean.TRUE)
 			.build();
-		myLocationRepository.save(myLocation);
+		myLocationJpaRepository.save(myLocation);
 
 		return new DefaultOAuth2User(
 			Collections.singleton(new SimpleGrantedAuthority(gitHubUser.getRole().name())),
@@ -66,12 +66,12 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 	}
 
 	private GitHubUser saveOrUpdate(UserInfoFromOauthServer userInfo) {
-		GitHubUser gitHubUser = gitHUbUserRepository.findByOauthId(userInfo.getOauthId())
+		GitHubUser gitHubUser = gitHUbUserJpaRepository.findByOauthId(userInfo.getOauthId())
 			.map(user -> user.update(
 				userInfo.getOauthId(),
 				userInfo.getNickname(),
 				userInfo.getImageUrl()))
 			.orElse(userInfo.toGitHubUser());
-		return gitHUbUserRepository.save(gitHubUser);
+		return gitHUbUserJpaRepository.save(gitHubUser);
 	}
 }

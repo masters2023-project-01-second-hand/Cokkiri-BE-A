@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.cokkiri.secondhand.user.entity.UserEntity;
 
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
 
 	Optional<UserEntity> findByNickname(String nickname);
 }

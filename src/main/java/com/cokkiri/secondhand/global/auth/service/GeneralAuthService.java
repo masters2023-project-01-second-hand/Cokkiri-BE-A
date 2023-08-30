@@ -13,12 +13,12 @@ import com.cokkiri.secondhand.global.exception.NicknameDuplicationException;
 import com.cokkiri.secondhand.global.exception.NotExistLocationException;
 import com.cokkiri.secondhand.global.exception.UsernameDuplicationException;
 import com.cokkiri.secondhand.item.entity.Location;
-import com.cokkiri.secondhand.item.repository.LocationRepository;
+import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GeneralUser;
 import com.cokkiri.secondhand.user.entity.MyLocation;
 import com.cokkiri.secondhand.user.entity.Role;
-import com.cokkiri.secondhand.user.repository.GeneralUserRepository;
-import com.cokkiri.secondhand.user.repository.MyLocationRepository;
+import com.cokkiri.secondhand.user.repository.GeneralUserJpaRepository;
+import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,13 +28,13 @@ import lombok.RequiredArgsConstructor;
 public class GeneralAuthService {
 
 	private final JwtTokenService jwtTokenService;
-	private final GeneralUserRepository generalUserRepository;
-	private final LocationRepository locationRepository;
-	private final MyLocationRepository myLocationRepository;
+	private final GeneralUserJpaRepository generalUserJpaRepository;
+	private final LocationJpaRepository locationJpaRepository;
+	private final MyLocationJpaRepository myLocationJpaRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	public JwtTokenResponse logIn(GeneralLogInRequest logInRequest) {
-		GeneralUser user = generalUserRepository.findByUsername(
+		GeneralUser user = generalUserJpaRepository.findByUsername(
 			logInRequest.getUsername()
 		).orElseThrow(LoginFailureException::new);
 
@@ -66,7 +66,7 @@ public class GeneralAuthService {
 			.build();
 		user.encodePassword(passwordEncoder);
 
-		Location location = locationRepository.findByName(Location.getDefaultName())
+		Location location = locationJpaRepository.findByName(Location.getDefaultName())
 			.orElseThrow(() -> new NotExistLocationException(Location.getDefaultName()));
 
 		MyLocation myLocation = MyLocation.builder()
@@ -75,15 +75,15 @@ public class GeneralAuthService {
 			.isSelected(Boolean.TRUE)
 			.build();
 
-		generalUserRepository.save(user);
-		myLocationRepository.save(myLocation);
+		generalUserJpaRepository.save(user);
+		myLocationJpaRepository.save(myLocation);
 	}
 
 	public boolean isDuplicateUsername(String username) {
-		return generalUserRepository.findByUsername(username).isPresent();
+		return generalUserJpaRepository.findByUsername(username).isPresent();
 	}
 
 	public boolean isDuplicateNickname(String nickname) {
-		return generalUserRepository.findByNickname(nickname).isPresent();
+		return generalUserJpaRepository.findByNickname(nickname).isPresent();
 	}
 }
