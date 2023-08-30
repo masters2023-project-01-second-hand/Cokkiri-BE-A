@@ -8,10 +8,10 @@ import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
-import com.cokkiri.secondhand.global.exception.LoginFailureException;
-import com.cokkiri.secondhand.global.exception.NicknameDuplicationException;
-import com.cokkiri.secondhand.global.exception.NotExistLocationException;
-import com.cokkiri.secondhand.global.exception.UsernameDuplicationException;
+import com.cokkiri.secondhand.global.exception.list.LoginFailureException;
+import com.cokkiri.secondhand.global.exception.list.NicknameDuplicationException;
+import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
+import com.cokkiri.secondhand.global.exception.list.UsernameDuplicationException;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GeneralUser;
@@ -67,7 +67,7 @@ public class GeneralAuthService {
 		user.encodePassword(passwordEncoder);
 
 		Location location = locationJpaRepository.findByName(Location.getDefaultName())
-			.orElseThrow(() -> new NotExistLocationException(Location.getDefaultName()));
+			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultName()));
 
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)

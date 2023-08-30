@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.cokkiri.secondhand.global.auth.entity.OAuthType;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoFromOauthServer;
-import com.cokkiri.secondhand.global.exception.NotExistLocationException;
+import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GitHubUser;
@@ -50,7 +50,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 		GitHubUser gitHubUser = saveOrUpdate(userInfo);
 
 		Location location = locationJpaRepository.findByName(Location.getDefaultName())
-			.orElseThrow(() -> new NotExistLocationException(Location.getDefaultName()));
+			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultName()));
 
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)
