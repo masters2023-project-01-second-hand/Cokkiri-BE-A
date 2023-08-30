@@ -8,17 +8,13 @@ import javax.persistence.Table;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-//@RequiredArgsConstructor
-//@AllArgsConstructor
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "GENERAL_USER")
 @PrimaryKeyJoinColumn(name = "user_id")

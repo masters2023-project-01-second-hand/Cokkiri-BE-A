@@ -1,5 +1,8 @@
 package com.cokkiri.secondhand.user.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,19 +12,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-//@AllArgsConstructor
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "USER")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -43,6 +44,9 @@ public class UserEntity {
 
 	@Enumerated(EnumType.STRING)
 	private UserType userType;
+
+	@OneToMany
+	private List<MyLocation> myLocations = new ArrayList<MyLocation>();
 
 	public UserEntity(String nickname, String profileImageUrl, Role role, UserType userType) {
 		this.nickname = nickname;

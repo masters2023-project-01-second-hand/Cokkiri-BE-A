@@ -14,17 +14,23 @@ import org.springframework.stereotype.Service;
 
 import com.cokkiri.secondhand.global.auth.entity.OAuthType;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoFromOauthServer;
+import com.cokkiri.secondhand.global.exception.NotExistLocationException;
+import com.cokkiri.secondhand.item.entity.Location;
+import com.cokkiri.secondhand.item.repository.LocationRepository;
 import com.cokkiri.secondhand.user.entity.GitHubUser;
+import com.cokkiri.secondhand.user.entity.MyLocation;
 import com.cokkiri.secondhand.user.repository.GitHubUserRepository;
+import com.cokkiri.secondhand.user.repository.MyLocationRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
 public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
 	private final GitHubUserRepository gitHUbUserRepository;
-
-	public OAuthService(GitHubUserRepository gitHUbUserRepository) {
-		this.gitHUbUserRepository = gitHUbUserRepository;
-	}
+	private final LocationRepository locationRepository;
+	private final MyLocationRepository myLocationRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -42,6 +48,16 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 		UserInfoFromOauthServer userInfo = OAuthType.extract(registrationId, attributes);
 
 		GitHubUser gitHubUser = saveOrUpdate(userInfo);
+
+		Location location = locationRepository.findByName(Location.getDefaultName())
+			.orElseThrow(() -> new NotExistLocationException(Location.getDefaultName()));
+
+		MyLocation myLocation = MyLocation.builder()
+			.location(location)
+			.user(gitHubUser)
+			.isSelected(Boolean.TRUE)
+			.build();
+		myLocationRepository.save(myLocation);
 
 		return new DefaultOAuth2User(
 			Collections.singleton(new SimpleGrantedAuthority(gitHubUser.getRole().name())),
