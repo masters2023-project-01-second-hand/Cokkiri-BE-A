@@ -54,7 +54,7 @@ public class SecurityConfig {
 
 			.oauth2Login()
 			.successHandler(oAuthLoginSuccessHandler)
-			//.failureHandler(oAuthLoginFailureHandler)
+			.failureHandler(oAuthLoginFailureHandler)
 			.userInfoEndpoint()
 			.userService(oAuthService);
 
