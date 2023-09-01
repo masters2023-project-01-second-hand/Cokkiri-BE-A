@@ -47,7 +47,8 @@ public class SecurityConfig {
 			.authorizeRequests()
 			.antMatchers("/api/users",
 				"/api/login",
-				"/api/reissue-access-token").permitAll()
+				"/api/reissue-access-token",
+				"/api/items").permitAll()
 			.anyRequest().authenticated()
 			.and()
 

@@ -5,25 +5,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Location {
+@Table(name = "CATEGORY")
+public class Category {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column
+	@Column(name = "id")
 	private Long id;
 
-	@Column(length = 100)
+	@Column(name = "name", length = 45, nullable = false)
 	private String name;
-
-	public static String getDefaultName() {
-		return "서울특별시 강남구 역삼1동";
-	}
 }
