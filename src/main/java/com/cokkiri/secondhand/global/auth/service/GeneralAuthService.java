@@ -81,10 +81,10 @@ public class GeneralAuthService {
 	}
 
 	public boolean isDuplicateUsername(String username) {
-		return generalUserJpaRepository.findByUsername(username).isPresent();
+		return generalUserJpaRepository.existsByUsername(username);
 	}
 
 	public boolean isDuplicateNickname(String nickname) {
-		return generalUserJpaRepository.findByNickname(nickname).isPresent();
+		return generalUserJpaRepository.existsByNickname(nickname);
 	}
 }
