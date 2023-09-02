@@ -27,8 +27,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	@Value("${jwt.whitelist}")

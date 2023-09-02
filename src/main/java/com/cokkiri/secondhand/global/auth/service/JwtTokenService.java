@@ -9,8 +9,8 @@ import com.cokkiri.secondhand.global.auth.infrastructure.MemoryJwtRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class JwtTokenService {
 
 	private final JwtTokenGenerator jwtTokenGenerator;
