@@ -97,7 +97,7 @@ public class JwtTokenGenerator  {
 
 	private JwtAccessToken createAccessToken(UserInfoForJwt user) {
 		Date expirationDate = getAccessExpirationDate();
-		return new JwtAccessToken(
+		return JwtAccessToken.from(
 			createToken(accessSubject, user.generateClaims(), expirationDate),
 			convertToDateTime(expirationDate)
 		);
@@ -105,7 +105,7 @@ public class JwtTokenGenerator  {
 
 	private JwtRefreshToken createRefreshToken() {
 		Date expirationDate = getRefreshExpirationDate();
-		return new JwtRefreshToken(
+		return JwtRefreshToken.from(
 			createToken(refreshSubject, Map.of(), expirationDate),
 			convertToDateTime(expirationDate)
 		);
