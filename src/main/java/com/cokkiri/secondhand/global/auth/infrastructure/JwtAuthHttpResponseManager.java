@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +21,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class JwtAuthHttpResponseManager {
 
+	private final String accessHttpHeader = HttpHeaders.AUTHORIZATION;
+
 	private final String authorizationType;
-	private final String accessHttpHeader;
 	private final String refreshHttpHeader;
 
 	public JwtAuthHttpResponseManager(
 		@Value("${jwt.authorization-type}") String authorizationType,
-		@Value("${jwt.access.http-header}") String accessHttpHeader,
 		@Value("${jwt.refresh.http-header}") String refreshHttpHeader) {
 
 		this.authorizationType = authorizationType + " ";
-		this.accessHttpHeader = accessHttpHeader;
 		this.refreshHttpHeader = refreshHttpHeader;
 	}
 
