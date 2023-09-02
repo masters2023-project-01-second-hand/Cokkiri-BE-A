@@ -6,7 +6,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.beans.factory.InitializingBean;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 
 @Component
-public class JwtTokenGenerator implements InitializingBean  {
+public class JwtTokenGenerator  {
 
 	private final String secret;
 	private final Long accessTokenExpirationTime;
@@ -49,8 +50,8 @@ public class JwtTokenGenerator implements InitializingBean  {
 		this.refreshSubject = refreshSubject;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void init() throws Exception {
 		this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 
