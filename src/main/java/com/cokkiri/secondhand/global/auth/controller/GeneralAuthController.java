@@ -14,9 +14,9 @@ import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
 import com.cokkiri.secondhand.global.auth.infrastructure.JwtAuthHttpResponseManager;
 import com.cokkiri.secondhand.global.auth.service.GeneralAuthService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 public class GeneralAuthController {
 

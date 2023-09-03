@@ -5,9 +5,11 @@ import com.cokkiri.secondhand.global.exception.CustomExceptionType;
 
 public class UsernameDuplicationException extends CustomException {
 
+	private static final String ERROR_MESSAGE_FORMAT = "[%s]은/는 이미 사용 중인 아이디 입니다.";
+
 	public UsernameDuplicationException(String username) {
 		super(
-			String.format("[%s]은/는 이미 사용 중인 아이디 입니다.", username),
-			CustomExceptionType.USER_NAME_DUPLICATION_EXCEPTION);
+			String.format(ERROR_MESSAGE_FORMAT, username),
+			CustomExceptionType.USERNAME_DUPLICATION_EXCEPTION);
 	}
 }

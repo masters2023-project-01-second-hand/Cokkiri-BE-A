@@ -22,8 +22,8 @@ import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class GeneralAuthService {
 
@@ -38,7 +38,8 @@ public class GeneralAuthService {
 			logInRequest.getUsername()
 		).orElseThrow(LoginFailureException::new);
 
-		if (!user.validatePassword(logInRequest.getPassword(), passwordEncoder)) {
+		String encodedInputPassword = passwordEncoder.encode(logInRequest.getPassword());
+		if (!user.validatePassword(encodedInputPassword)) {
 			throw new LoginFailureException();
 		}
 
@@ -80,10 +81,10 @@ public class GeneralAuthService {
 	}
 
 	public boolean isDuplicateUsername(String username) {
-		return generalUserJpaRepository.findByUsername(username).isPresent();
+		return generalUserJpaRepository.existsByUsername(username);
 	}
 
 	public boolean isDuplicateNickname(String nickname) {
-		return generalUserJpaRepository.findByNickname(nickname).isPresent();
+		return generalUserJpaRepository.existsByNickname(nickname);
 	}
 }

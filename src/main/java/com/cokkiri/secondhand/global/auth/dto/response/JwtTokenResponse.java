@@ -17,7 +17,7 @@ public class JwtTokenResponse {
 	private LocalDateTime expirationRefreshTokenDateTime;
 
 	public JwtRefreshToken toRefreshToken() {
-		return new JwtRefreshToken(
+		return JwtRefreshToken.from(
 			refreshToken,
 			expirationRefreshTokenDateTime
 		);

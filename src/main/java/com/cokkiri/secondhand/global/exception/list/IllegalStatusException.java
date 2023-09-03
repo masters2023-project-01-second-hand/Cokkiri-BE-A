@@ -5,9 +5,11 @@ import com.cokkiri.secondhand.global.exception.CustomExceptionType;
 
 public class IllegalStatusException extends CustomException {
 
+	private static final String ERROR_MESSAGE_FORMAT = "[%s]은/는 유효한 Status값이 아닙니다.";
+
 	public IllegalStatusException(String name) {
 		super(
-			String.format("[%s]은 유효한 Status값이 아닙니다.", name),
+			String.format(ERROR_MESSAGE_FORMAT, name),
 			CustomExceptionType.ILLEGAL_STATUS_EXCEPTION);
 	}
 }

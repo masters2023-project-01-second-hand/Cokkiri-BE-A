@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +21,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class JwtAuthHttpResponseManager {
 
-	private final String AUTHORIZATION_TYPE;
-	private final String ACCESS_HTTP_HEADER;
-	private final String REFRESH_HTTP_HEADER;
+	private final String accessHttpHeader = HttpHeaders.AUTHORIZATION;
+
+	private final String authorizationType;
+	private final String refreshHttpHeader;
 
 	public JwtAuthHttpResponseManager(
-		@Value("${jwt.authorization-type}") String AUTHORIZATION_TYPE,
-		@Value("${jwt.access.http-header}") String ACCESS_HTTP_HEADER,
-		@Value("${jwt.refresh.http-header}") String REFRESH_HTTP_HEADER) {
+		@Value("${jwt.authorization-type}") String authorizationType,
+		@Value("${jwt.refresh.http-header}") String refreshHttpHeader) {
 
-		this.AUTHORIZATION_TYPE = AUTHORIZATION_TYPE + " ";
-		this.ACCESS_HTTP_HEADER = ACCESS_HTTP_HEADER;
-		this.REFRESH_HTTP_HEADER = REFRESH_HTTP_HEADER;
+		this.authorizationType = authorizationType + " ";
+		this.refreshHttpHeader = refreshHttpHeader;
 	}
 
 	public JwtTokenResponse setAuthHttpResponse(HttpServletResponse response, JwtTokenResponse jwtTokenResponse) {
@@ -41,21 +41,21 @@ public class JwtAuthHttpResponseManager {
 	}
 
 	public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-		response.setHeader(ACCESS_HTTP_HEADER, AUTHORIZATION_TYPE + accessToken);
+		response.setHeader(accessHttpHeader, authorizationType + accessToken);
 	}
 
 	public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-		response.setHeader(REFRESH_HTTP_HEADER, AUTHORIZATION_TYPE + refreshToken);
+		response.setHeader(refreshHttpHeader, authorizationType + refreshToken);
 	}
 
 	public boolean isContainAccessToken(HttpServletRequest request) {
-		String authorization = request.getHeader(ACCESS_HTTP_HEADER);
-		return authorization != null && authorization.startsWith(AUTHORIZATION_TYPE);
+		String authorization = request.getHeader(accessHttpHeader);
+		return authorization != null && authorization.startsWith(authorizationType);
 	}
 
 	public String getAccessToken(HttpServletRequest request) {
-		String authorization = request.getHeader(ACCESS_HTTP_HEADER);
-		return authorization.replace(AUTHORIZATION_TYPE, "");
+		String authorization = request.getHeader(accessHttpHeader);
+		return authorization.replace(authorizationType, "");
 	}
 
 	public void sendNotExistAccessTokenException(ServletResponse response, ObjectMapper objectMapper) throws IOException {

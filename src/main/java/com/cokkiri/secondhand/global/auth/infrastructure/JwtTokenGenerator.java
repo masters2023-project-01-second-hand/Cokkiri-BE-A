@@ -6,7 +6,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.beans.factory.InitializingBean;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,33 +26,33 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 
 @Component
-public class JwtTokenGenerator implements InitializingBean  {
+public class JwtTokenGenerator  {
 
-	private final String SECRET;
-	private final Long ACCESS_EXPIRATION_TIME;
-	private final Long REFRESH_EXPIRATION_TIME;
-	private final String ACCESS_SUBJECT;
-	private final String REFRESH_SUBJECT;
+	private final String secret;
+	private final Long accessTokenExpirationTime;
+	private final Long refreshTokenExpirationTime;
+	private final String accessSubject;
+	private final String refreshSubject;
 	private Key secretKey;
 
 	public JwtTokenGenerator(
 		MemoryJwtRepository memoryJwtRepository,
-		@Value("${jwt.secret}") String SECRET,
-		@Value("${jwt.access.expiration-time-in-milli-seconds}") Long ACCESS_EXPIRATION_TIME,
-		@Value("${jwt.refresh.expiration-time-in-milli-seconds}") Long REFRESH_EXPIRATION_TIME,
-		@Value("${jwt.access.subject}") String ACCESS_SUBJECT,
-		@Value("${jwt.access.subject}") String REFRESH_SUBJECT) {
+		@Value("${jwt.secret}") String secret,
+		@Value("${jwt.access.expiration-time-in-milli-seconds}") Long accessTokenExpirationTime,
+		@Value("${jwt.refresh.expiration-time-in-milli-seconds}") Long refreshTokenExpirationTime,
+		@Value("${jwt.access.subject}") String accessSubject,
+		@Value("${jwt.access.subject}") String refreshSubject) {
 
-		this.SECRET = SECRET;
-		this.ACCESS_EXPIRATION_TIME = ACCESS_EXPIRATION_TIME;
-		this.REFRESH_EXPIRATION_TIME = REFRESH_EXPIRATION_TIME;
-		this.ACCESS_SUBJECT = ACCESS_SUBJECT;
-		this.REFRESH_SUBJECT = REFRESH_SUBJECT;
+		this.secret = secret;
+		this.accessTokenExpirationTime = accessTokenExpirationTime;
+		this.refreshTokenExpirationTime = refreshTokenExpirationTime;
+		this.accessSubject = accessSubject;
+		this.refreshSubject = refreshSubject;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		this.secretKey = Keys.hmacShaKeyFor(SECRET.getBytes());
+	@PostConstruct
+	public void init() throws Exception {
+		this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 	}
 
 	public JwtTokenResponse createJwtTokenResponse(UserInfoForJwt user) {
@@ -96,16 +97,16 @@ public class JwtTokenGenerator implements InitializingBean  {
 
 	private JwtAccessToken createAccessToken(UserInfoForJwt user) {
 		Date expirationDate = getAccessExpirationDate();
-		return new JwtAccessToken(
-			createToken(ACCESS_SUBJECT, user.generateClaims(), expirationDate),
+		return JwtAccessToken.from(
+			createToken(accessSubject, user.generateClaims(), expirationDate),
 			convertToDateTime(expirationDate)
 		);
 	}
 
 	private JwtRefreshToken createRefreshToken() {
 		Date expirationDate = getRefreshExpirationDate();
-		return new JwtRefreshToken(
-			createToken(REFRESH_SUBJECT, Map.of(), expirationDate),
+		return JwtRefreshToken.from(
+			createToken(refreshSubject, Map.of(), expirationDate),
 			convertToDateTime(expirationDate)
 		);
 	}
@@ -121,11 +122,11 @@ public class JwtTokenGenerator implements InitializingBean  {
 	}
 
 	private Date getAccessExpirationDate() {
-		return new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME);
+		return new Date(System.currentTimeMillis() + accessTokenExpirationTime);
 	}
 
 	private Date getRefreshExpirationDate() {
-		return new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_TIME);
+		return new Date(System.currentTimeMillis() + refreshTokenExpirationTime);
 	}
 
 	private LocalDateTime convertToDateTime(Date date) {
