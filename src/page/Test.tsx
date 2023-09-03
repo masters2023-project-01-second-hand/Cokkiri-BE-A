@@ -1,40 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { styled } from 'styled-components';
+import { getItem } from '../api/fetcher';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { Modal } from '../components/Modal';
-import { TestModalContent } from '../components/TestModalContent';
+import { ProductItem } from '../components/ProductItem';
 import { Icon } from '../components/icon/Icon';
-import { countStore } from '../store';
+import { LocationModal } from '../components/locations/LocationModal';
 
 export function Test() {
-  const { count, increment } = countStore();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: itemData, isLoading, isError } = useQuery(['items'], getItem);
 
-  const { data, error, isLoading } = useQuery<string, Error>(
-    ['test'],
-    fetchTest
-  );
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  if (isLoading) console.log('loading');
-
-  if (error) console.log(error.message);
-
-  async function fetchTest() {
-    const res = await fetch('/api/test');
-
-    return res.json();
+  if (isError) {
+    return <div>Error occurred</div>;
   }
   return (
     <Div>
-      <ResDiv>react query res : {data}</ResDiv>
-      <TestZustand>
-        <div>count :{count}</div>
-        <Button styledType="ghost" color="accentPrimary" onClick={increment}>
-          <Icon name="plus" color="neutralTextStrong" />
-        </Button>
-      </TestZustand>
+      <ProductItem {...itemData.items[0]} />
       <Button styledType="container" color="accentPrimary">
         <Login>로그인</Login>
       </Button>
@@ -98,13 +85,7 @@ export function Test() {
         Open Modal
       </Button>
       {isOpen && (
-        <Modal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          headline="동네 설정"
-        >
-          <TestModalContent />
-        </Modal>
+        <LocationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       )}
     </Div>
   );
@@ -165,16 +146,4 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-`;
-
-const ResDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const TestZustand = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
