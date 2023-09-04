@@ -1,7 +1,5 @@
 package com.cokkiri.secondhand.user.entity;
 
-import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -42,9 +40,4 @@ public class GeneralUser extends UserEntity {
 	public boolean validatePassword(String password, PasswordEncoder passwordEncoder) {
 		return passwordEncoder.matches(password, this.password);
 	}
-
-	public boolean validatePassword(String encodedInputPassword) {
-		return Objects.equals(this.password, encodedInputPassword);
-	}
-
 }

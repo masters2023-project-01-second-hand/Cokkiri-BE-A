@@ -38,8 +38,7 @@ public class GeneralAuthService {
 			logInRequest.getUsername()
 		).orElseThrow(LoginFailureException::new);
 
-		String encodedInputPassword = passwordEncoder.encode(logInRequest.getPassword());
-		if (!user.validatePassword(encodedInputPassword)) {
+		if (!validatePassword(logInRequest, user)) {
 			throw new LoginFailureException();
 		}
 
@@ -86,5 +85,9 @@ public class GeneralAuthService {
 
 	public boolean isDuplicateNickname(String nickname) {
 		return generalUserJpaRepository.existsByNickname(nickname);
+	}
+
+	private boolean validatePassword(GeneralLogInRequest logInRequest, GeneralUser user) {
+		return passwordEncoder.matches(logInRequest.getPassword(), user.getPassword());
 	}
 }
