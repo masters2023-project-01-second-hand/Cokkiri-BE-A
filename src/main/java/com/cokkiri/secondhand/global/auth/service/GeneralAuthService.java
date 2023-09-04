@@ -67,8 +67,8 @@ public class GeneralAuthService {
 			.build();
 		user.encodePassword(passwordEncoder);
 
-		Location location = locationJpaRepository.findByName(Location.getDefaultName())
-			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultName()));
+		Location location = locationJpaRepository.findById(Location.getDefaultId())
+			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultId()));
 
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)

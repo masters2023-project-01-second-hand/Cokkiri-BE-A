@@ -8,5 +8,5 @@ import com.cokkiri.secondhand.item.entity.Location;
 
 public interface LocationJpaRepository extends JpaRepository<Location, Long> {
 
-	public Optional<Location> findByName(String name);
+	public Optional<Location> findById(Long id);
 }

@@ -15,15 +15,27 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Location {
 
+	private static final Long DEFAULT_LOCATION_ID = 1970L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
 	private Long id;
 
-	@Column(length = 100)
-	private String name;
+	@Column(length = 100, name = "depth_1")
+	private String depth1;
 
-	public static String getDefaultName() {
-		return "서울특별시 강남구 역삼1동";
+	@Column(length = 100, name = "depth_2")
+	private String depth2;
+
+	@Column(length = 100, name = "depth_3")
+	private String depth3;
+
+	public static Long getDefaultId() {
+		return DEFAULT_LOCATION_ID;
+	}
+
+	public String getFullName() {
+		return String.format("%s %s %s", depth1, depth2, depth3);
 	}
 }
