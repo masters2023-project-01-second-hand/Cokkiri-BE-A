@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class LocationNameListResponse {
 
 	private List<LocationNameResponse> locations;
-	private Long nextCursor;
+	private Long nextPage;
 }

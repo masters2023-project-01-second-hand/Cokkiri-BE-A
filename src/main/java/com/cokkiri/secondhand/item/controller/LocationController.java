@@ -1,5 +1,7 @@
 package com.cokkiri.secondhand.item.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,9 +21,9 @@ public class LocationController {
 
 	@GetMapping("/api/locations")
 	public ResponseEntity<LocationNameListResponse> searchLocations(
-		@RequestParam(required = false) String query,
-		@RequestParam(required = false, defaultValue = "0") int cursor) {
+		@PageableDefault(size = 15, page = 0) Pageable pageable,
+		@RequestParam(required = false) String query) {
 
-		return ResponseEntity.ok(locationService.searchLocations(query, cursor));
+		return ResponseEntity.ok(locationService.searchLocations(query, pageable));
 	}
 }
