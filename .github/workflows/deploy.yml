@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: touch -c application-prod.yml
       - run: echo "${{ secrets.APPLICATION }}" > application-prod.yml
-      - run: mv application-prod.yml be/kiosk/src/main/resources/application-prod.yml
+      - run: mv application-prod.yml src/main/resources/application-prod.yml
 
       - name: Build with Gradle
         run: |
