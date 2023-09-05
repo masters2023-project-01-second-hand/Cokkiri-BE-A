@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.user.dto.request.AddMyLocationRequest;
 import com.cokkiri.secondhand.user.dto.response.MyLocationListResponse;
+import com.cokkiri.secondhand.user.dto.response.MyLocationResponse;
 import com.cokkiri.secondhand.user.service.MyLocationService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,10 +35,20 @@ public class MyLocationController {
 	}
 
 	@PostMapping("/api/users/locations")
-	public ResponseEntity<?> addMyLocation(HttpServletRequest request, @RequestBody AddMyLocationRequest addMyLocationRequest) {
+	public ResponseEntity<MyLocationResponse> addMyLocation(HttpServletRequest request, @RequestBody AddMyLocationRequest addMyLocationRequest) {
 
 		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
 
 		return ResponseEntity.ok(myLocationService.addMyLocation(addMyLocationRequest, userInfoForJwt));
+	}
+
+	@PatchMapping("/api/users/locations/{myLocationId}")
+	public ResponseEntity<Void> chooseMyLocation(HttpServletRequest request, @PathVariable Long myLocationId) {
+
+		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
+
+		myLocationService.chooseMyLocation(myLocationId, userInfoForJwt);
+
+		return ResponseEntity.ok(null);
 	}
 }

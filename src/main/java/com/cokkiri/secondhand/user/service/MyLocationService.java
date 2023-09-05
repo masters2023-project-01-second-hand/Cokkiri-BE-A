@@ -10,6 +10,7 @@ import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.list.DuplicateMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.LimitExceededMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
+import com.cokkiri.secondhand.global.exception.list.NotFoundMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundUserException;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
@@ -67,6 +68,20 @@ public class MyLocationService {
 			.build();
 
 		return MyLocationResponse.from(myLocationJpaRepository.save(myLocation));
+	}
+
+	@Transactional
+	public void chooseMyLocation(Long myLocationId, UserInfoForJwt userInfoForJwt) {
+
+		Long userId = userInfoForJwt.getIdAsLong();
+
+		myLocationJpaRepository.updateAllIsSelectedToFalse(userId);
+
+		MyLocation myLocation = myLocationJpaRepository.findByIdAndUserId(myLocationId, userId)
+			.orElseThrow(() -> new NotFoundMyLocationException(myLocationId));
+		myLocation.selectMyLocation();
+
+		myLocationJpaRepository.save(myLocation);
 	}
 
 	private boolean existMyLocation(UserEntity user, Location location) {

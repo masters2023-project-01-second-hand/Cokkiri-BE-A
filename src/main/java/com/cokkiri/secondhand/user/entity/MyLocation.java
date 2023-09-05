@@ -44,4 +44,8 @@ public class MyLocation {
 		this.location = location;
 		this.isSelected = isSelected;
 	}
+
+	public void selectMyLocation() {
+		this.isSelected = true;
+	}
 }
