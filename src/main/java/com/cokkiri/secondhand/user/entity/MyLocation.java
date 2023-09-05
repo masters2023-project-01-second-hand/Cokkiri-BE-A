@@ -48,4 +48,8 @@ public class MyLocation {
 	public void chooseMyLocation() {
 		this.selected = true;
 	}
+
+	public void selectMyLocation() {
+		this.isSelected = true;
+	}
 }
