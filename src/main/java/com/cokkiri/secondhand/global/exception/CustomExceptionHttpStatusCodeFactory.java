@@ -23,6 +23,7 @@ public class CustomExceptionHttpStatusCodeFactory {
 			case LIMIT_EXCEEDED_MY_LOCATION_EXCEPTION:
 				return HttpStatus.CONFLICT;		// 409
 			case ILLEGAL_STATUS_EXCEPTION:
+			case MY_LOCATION_DELETION_NOT_ALLOWED_EXCEPTION:
 			default:
 				return HttpStatus.BAD_REQUEST;	// 400
 		}

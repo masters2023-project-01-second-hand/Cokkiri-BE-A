@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.list.DuplicateMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.LimitExceededMyLocationException;
+import com.cokkiri.secondhand.global.exception.list.MyLocationDeletionNotAllowedException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundUserException;
@@ -82,6 +83,24 @@ public class MyLocationService {
 		myLocation.selectMyLocation();
 
 		myLocationJpaRepository.save(myLocation);
+	}
+
+	@Transactional
+	public void removeMyLocation(Long myLocationId, UserInfoForJwt userInfoForJwt) {
+
+		Long userId = userInfoForJwt.getIdAsLong();
+
+		UserEntity user = userEntityJpaRepository.findById(userId)
+			.orElseThrow(() -> new NotFoundUserException(userId));
+
+		MyLocation myLocation = myLocationJpaRepository.findByIdAndUserId(myLocationId, userId)
+			.orElseThrow(() -> new NotFoundMyLocationException(myLocationId));
+
+		if (myLocation.isSelected()) {
+			throw new MyLocationDeletionNotAllowedException();
+		}
+
+		myLocationJpaRepository.delete(myLocation);
 	}
 
 	private boolean existMyLocation(UserEntity user, Location location) {
