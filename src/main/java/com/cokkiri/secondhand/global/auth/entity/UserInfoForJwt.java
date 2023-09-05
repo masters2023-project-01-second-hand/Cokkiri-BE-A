@@ -55,6 +55,10 @@ public class UserInfoForJwt {
 		return Map.of("id", String.valueOf(this.userId), "userType", userType.name());
 	}
 
+	public Long getIdAsLong() {
+		return Long.valueOf(this.id);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
