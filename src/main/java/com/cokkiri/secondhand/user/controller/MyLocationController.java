@@ -4,9 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.user.dto.request.AddMyLocationRequest;
 import com.cokkiri.secondhand.user.dto.response.MyLocationListResponse;
 import com.cokkiri.secondhand.user.service.MyLocationService;
 
@@ -26,5 +29,13 @@ public class MyLocationController {
 		return ResponseEntity.ok(
 			myLocationService.getMyLocationByUserId(userInfoForJwt)
 		);
+	}
+
+	@PostMapping("/api/users/locations")
+	public ResponseEntity<?> addMyLocation(HttpServletRequest request, @RequestBody AddMyLocationRequest addMyLocationRequest) {
+
+		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
+
+		return ResponseEntity.ok(myLocationService.addMyLocation(addMyLocationRequest, userInfoForJwt));
 	}
 }

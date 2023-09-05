@@ -9,4 +9,8 @@ import com.cokkiri.secondhand.user.entity.MyLocation;
 public interface MyLocationJpaRepository extends JpaRepository<MyLocation, Long> {
 
 	List<MyLocation> findAllByUserId(Long userId);
+
+	boolean existsByUserIdAndLocationId(Long userId, Long locationId);
+
+	Long countByUserId(Long userId);
 }
