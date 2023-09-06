@@ -23,16 +23,18 @@ public class ItemResponse {
 	private String price;
 	private CountDataResponse countData;
 	private String thumbnailUrl;
+	private boolean isSeller;
 
 	public static ItemResponse from(Item item) {
 		return new ItemResponse(
 			item.getId(),
 			item.getTitle(),
-			item.getLocation().getName(),
+			item.getLocation().getFullName(),
 			item.getCreateAt(),
 			item.getStatus().getName().getName(),
 			PriceFormatter.addCommasTo(item.getPrice()),
 			null,	// TODO: countData 추가하기
-			null);			// TODO: image 추가하기
+			null,			// TODO: image 추가하기
+			false);			// TODO: isSeller 추가하기
 	}
 }

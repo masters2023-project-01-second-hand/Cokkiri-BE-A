@@ -49,8 +49,8 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
 		GitHubUser gitHubUser = saveOrUpdate(userInfo);
 
-		Location location = locationJpaRepository.findByName(Location.getDefaultName())
-			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultName()));
+		Location location = locationJpaRepository.findById(Location.getDefaultId())
+			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultId()));
 
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)

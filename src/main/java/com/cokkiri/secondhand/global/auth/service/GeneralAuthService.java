@@ -38,8 +38,7 @@ public class GeneralAuthService {
 			logInRequest.getUsername()
 		).orElseThrow(LoginFailureException::new);
 
-		String encodedInputPassword = passwordEncoder.encode(logInRequest.getPassword());
-		if (!user.validatePassword(encodedInputPassword)) {
+		if (!validatePassword(logInRequest, user)) {
 			throw new LoginFailureException();
 		}
 
@@ -67,8 +66,8 @@ public class GeneralAuthService {
 			.build();
 		user.encodePassword(passwordEncoder);
 
-		Location location = locationJpaRepository.findByName(Location.getDefaultName())
-			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultName()));
+		Location location = locationJpaRepository.findById(Location.getDefaultId())
+			.orElseThrow(() -> new NotFoundLocationException(Location.getDefaultId()));
 
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)
@@ -86,5 +85,9 @@ public class GeneralAuthService {
 
 	public boolean isDuplicateNickname(String nickname) {
 		return generalUserJpaRepository.existsByNickname(nickname);
+	}
+
+	private boolean validatePassword(GeneralLogInRequest logInRequest, GeneralUser user) {
+		return passwordEncoder.matches(logInRequest.getPassword(), user.getPassword());
 	}
 }
