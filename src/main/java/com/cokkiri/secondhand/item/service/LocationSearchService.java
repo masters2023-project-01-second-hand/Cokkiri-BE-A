@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class LocationService {
+public class LocationSearchService {
 
 	private static final String DEFAULT_KEYWORD = "서울 역삼";
 	private static final String SINGLE_LETTER_REGEX = "[ㄱ-ㅎㅏ-ㅣ]";

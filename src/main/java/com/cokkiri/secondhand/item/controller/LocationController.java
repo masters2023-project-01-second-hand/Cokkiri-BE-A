@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cokkiri.secondhand.item.dto.response.LocationNameListResponse;
-import com.cokkiri.secondhand.item.service.LocationService;
+import com.cokkiri.secondhand.item.service.LocationSearchService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,14 +16,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class LocationController {
 
-	private final LocationService locationService;
-
+	private final LocationSearchService locationSearchService;
 
 	@GetMapping("/api/locations")
 	public ResponseEntity<LocationNameListResponse> searchLocations(
 		@PageableDefault(size = 15, page = 0) Pageable pageable,
 		@RequestParam(required = false) String query) {
 
-		return ResponseEntity.ok(locationService.searchLocations(query, pageable));
+		return ResponseEntity.ok(locationSearchService.searchLocations(query, pageable));
 	}
 }
