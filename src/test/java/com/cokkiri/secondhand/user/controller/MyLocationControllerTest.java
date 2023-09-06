@@ -11,23 +11,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.cokkiri.secondhand.global.auth.config.SecurityConfig;
+import com.cokkiri.secondhand.ApiTest;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
-import com.cokkiri.secondhand.global.auth.filter.JwtAuthorizationFilter;
-import com.cokkiri.secondhand.global.auth.infrastructure.JwtAuthHttpResponseManager;
 import com.cokkiri.secondhand.global.exception.CustomException;
-import com.cokkiri.secondhand.global.exception.CustomExceptionHttpStatusCodeFactory;
-import com.cokkiri.secondhand.global.exception.GlobalExceptionHandler;
 import com.cokkiri.secondhand.global.exception.list.DuplicateMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.LimitExceededMyLocationException;
 import com.cokkiri.secondhand.global.exception.list.MyLocationDeletionNotAllowedException;
@@ -40,16 +31,7 @@ import com.cokkiri.secondhand.user.entity.UserType;
 import com.cokkiri.secondhand.user.service.MyLocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@ComponentScan({"customExceptionHttpStatusCodeFactory", "globalExceptionHandler"})
-@AutoConfigureMockMvc(addFilters = false)
-@Import({CustomExceptionHttpStatusCodeFactory.class, GlobalExceptionHandler.class})
-@WebMvcTest(controllers = MyLocationController.class
-	, excludeFilters =
-		{@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-			classes = {SecurityConfig.class, JwtAuthorizationFilter.class,
-				JwtAuthHttpResponseManager.class
-			})
-		})
+@ApiTest
 class MyLocationControllerTest {
 
 	@Autowired
