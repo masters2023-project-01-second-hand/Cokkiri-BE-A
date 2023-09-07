@@ -23,7 +23,7 @@ public class GeneralUser extends UserEntity {
 	@Column(name = "username", length = 100, unique = true, nullable = false)
 	private String username;
 
-	@Column(name = "password", length = 1000, unique = true, nullable = false)
+	@Column(name = "password", length = 1000, nullable = false)
 	private String password;
 
 	public GeneralUser(String nickname, String profileImageUrl, Role role, String username,

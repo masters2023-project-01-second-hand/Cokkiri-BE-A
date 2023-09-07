@@ -37,7 +37,7 @@ public class MyLocationService {
 
 		List<MyLocationResponse> locations
 			= myLocationJpaRepository.findAllByUserId(
-				userInfoForJwt.getIdAsLong()).stream()
+				userInfoForJwt.getUserId()).stream()
 			.filter(myLocation -> !myLocation.isSelected())
 			.map(MyLocationResponse::from)
 			.collect(Collectors.toUnmodifiableList());
@@ -48,8 +48,8 @@ public class MyLocationService {
 	@Transactional
 	public MyLocationResponse addMyLocation(AddMyLocationRequest addMyLocationRequest, UserInfoForJwt userInfoForJwt) {
 
-		UserEntity user = userEntityJpaRepository.findById(userInfoForJwt.getIdAsLong())
-			.orElseThrow(() -> new NotFoundUserException(userInfoForJwt.getIdAsLong()));
+		UserEntity user = userEntityJpaRepository.findById(userInfoForJwt.getUserId())
+			.orElseThrow(() -> new NotFoundUserException(userInfoForJwt.getUserId()));
 
 		Location location = locationJpaRepository.findById(addMyLocationRequest.getLocationId())
 			.orElseThrow(() -> new NotFoundLocationException(addMyLocationRequest.getLocationId()));
@@ -65,7 +65,7 @@ public class MyLocationService {
 		MyLocation myLocation = MyLocation.builder()
 			.user(user)
 			.location(location)
-			.isSelected(false)
+			.selected(false)
 			.build();
 
 		return MyLocationResponse.from(myLocationJpaRepository.save(myLocation));
@@ -74,13 +74,13 @@ public class MyLocationService {
 	@Transactional
 	public void chooseMyLocation(Long myLocationId, UserInfoForJwt userInfoForJwt) {
 
-		Long userId = userInfoForJwt.getIdAsLong();
+		Long userId = userInfoForJwt.getUserId();
 
 		myLocationJpaRepository.updateAllIsSelectedToFalse(userId);
 
 		MyLocation myLocation = myLocationJpaRepository.findByIdAndUserId(myLocationId, userId)
 			.orElseThrow(() -> new NotFoundMyLocationException(myLocationId));
-		myLocation.selectMyLocation();
+		myLocation.chooseMyLocation();
 
 		myLocationJpaRepository.save(myLocation);
 	}
@@ -88,7 +88,7 @@ public class MyLocationService {
 	@Transactional
 	public void removeMyLocation(Long myLocationId, UserInfoForJwt userInfoForJwt) {
 
-		Long userId = userInfoForJwt.getIdAsLong();
+		Long userId = userInfoForJwt.getUserId();
 
 		UserEntity user = userEntityJpaRepository.findById(userId)
 			.orElseThrow(() -> new NotFoundUserException(userId));
