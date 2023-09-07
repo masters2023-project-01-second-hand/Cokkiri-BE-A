@@ -72,7 +72,7 @@ public class GeneralAuthService {
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)
 			.user(user)
-			.isSelected(Boolean.TRUE)
+			.selected(Boolean.TRUE)
 			.build();
 
 		generalUserJpaRepository.save(user);

@@ -43,7 +43,7 @@ class MyLocationControllerTest {
 	@MockBean
 	private MyLocationService myLocationService;
 
-	private final UserInfoForJwt userInfoForJwt = new UserInfoForJwt(String.valueOf(1L), UserType.GENERAL);
+	private final UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateUserInfo(1L, UserType.GENERAL);
 
 	@DisplayName("[내 동네 목록 불러오기]")
 	@Nested

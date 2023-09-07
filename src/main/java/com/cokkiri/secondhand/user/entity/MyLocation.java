@@ -35,17 +35,17 @@ public class MyLocation {
 	@JoinColumn(name = "location_id")
 	private Location location;
 
-	@Column
-	private boolean isSelected;
+	@Column(name = "is_selected")
+	private boolean selected;
 
 	@Builder
-	public MyLocation(UserEntity user, Location location, boolean isSelected) {
+	public MyLocation(UserEntity user, Location location, boolean selected) {
 		this.user = user;
 		this.location = location;
-		this.isSelected = isSelected;
+		this.selected = selected;
 	}
 
-	public void selectMyLocation() {
-		this.isSelected = true;
+	public void chooseMyLocation() {
+		this.selected = true;
 	}
 }

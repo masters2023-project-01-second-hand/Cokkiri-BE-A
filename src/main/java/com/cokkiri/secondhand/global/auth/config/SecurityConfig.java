@@ -44,10 +44,12 @@ public class SecurityConfig {
 			.and()
 
 			.authorizeRequests()
-			.antMatchers("/api/users",
+			.antMatchers(
+				"/api/users",
 				"/api/login",
-				"/api/reissue-access-token",
-				"/api/items").permitAll()
+				"/api/reissue-access-token").permitAll() // White URI List
+			.antMatchers(
+				"/api/items").permitAll() // Public URI List
 			.anyRequest().authenticated()
 			.and()
 

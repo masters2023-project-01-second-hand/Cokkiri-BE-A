@@ -59,4 +59,8 @@ public class Item {
 	@OneToOne
 	@JoinColumn(name = "metadata_id")
 	private ItemMetadata itemMetadata;
+
+	public Long findSellerId() {
+		return seller.getId();
+	}
 }

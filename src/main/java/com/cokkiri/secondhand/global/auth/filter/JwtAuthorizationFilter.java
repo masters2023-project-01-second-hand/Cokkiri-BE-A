@@ -31,8 +31,11 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-	@Value("${jwt.whitelist}")
+	@Value("${jwt.white-list}")
 	private String[] whiteListUrls;
+
+	@Value("${jwt.public-list}")
+	private String[] publicListUrls;
 
 	private final JwtAuthHttpResponseManager jwtAuthHttpResponseManager;
 	private final JwtTokenGenerator jwtTokenGenerator;
@@ -44,25 +47,33 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		//HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 
-		if (httpServletRequest.getMethod().equals("OPTIONS")) {
+		if (request.getMethod().equals("OPTIONS")) {
 			return;
 		}
 
-		if (whiteListCheck(httpServletRequest.getRequestURI())) {
+		if (whiteListCheck(request.getRequestURI())) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		if (!jwtAuthHttpResponseManager.isContainAccessToken(httpServletRequest)) {
+		if (!jwtAuthHttpResponseManager.isContainAccessToken(request)) {
+
+			if (publicListCheck(request.getRequestURI())) {
+				UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateGuestUserInfo();
+				request.setAttribute("userInfoForJwt", userInfoForJwt);
+				filterChain.doFilter(request, response);
+				return;
+			}
+
 			jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
 			return;
 		}
 
 		try {
-			String token = jwtAuthHttpResponseManager.getAccessToken(httpServletRequest);
-			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserForJwtBy(token);
+			String token = jwtAuthHttpResponseManager.getAccessToken(request);
+			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserInfoForJwtBy(token);
 			SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
 
 			request.setAttribute("userInfoForJwt", userInfoForJwt);
@@ -77,10 +88,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		return PatternMatchUtils.simpleMatch(whiteListUrls, uri);
 	}
 
+	private boolean publicListCheck(String uri) {
+		return PatternMatchUtils.simpleMatch(publicListUrls, uri);
+	}
+
 	public Authentication getAuthentication(UserInfoForJwt userInfoForJwt) {
 
 		UserDetails userDetailsUser = User.builder()
-			.username(userInfoForJwt.getId())
+			.username(String.valueOf(userInfoForJwt.getUserId()))
 			.password(UUID.randomUUID().toString())
 			.roles(userInfoForJwt.getUserType().name())
 			.build();

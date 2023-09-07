@@ -55,7 +55,7 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 		MyLocation myLocation = MyLocation.builder()
 			.location(location)
 			.user(gitHubUser)
-			.isSelected(Boolean.TRUE)
+			.selected(Boolean.TRUE)
 			.build();
 		myLocationJpaRepository.save(myLocation);
 

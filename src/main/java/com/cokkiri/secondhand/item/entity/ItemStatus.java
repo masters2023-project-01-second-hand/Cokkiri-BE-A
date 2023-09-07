@@ -24,4 +24,8 @@ public class ItemStatus {
 
 	@Convert(converter = StatusConverter.class)
 	private Status name;
+
+	public String getStatusName() {
+		return name.getName();
+	}
 }
