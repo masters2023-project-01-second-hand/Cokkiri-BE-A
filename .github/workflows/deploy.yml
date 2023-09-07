@@ -28,6 +28,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Configure application-prod.yml
         run: |
           touch -c application-prod.yml
           echo "${{ secrets.APPLICATION }}" > application-prod.yml
