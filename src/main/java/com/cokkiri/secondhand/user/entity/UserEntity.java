@@ -45,8 +45,8 @@ public class UserEntity {
 	@Enumerated(EnumType.STRING)
 	private UserType userType;
 
-	@OneToMany
-	private List<MyLocation> myLocations = new ArrayList<MyLocation>();
+	// @OneToMany
+	// private List<MyLocation> myLocations = new ArrayList<>();
 
 	public UserEntity(String nickname, String profileImageUrl, Role role, UserType userType) {
 		this.nickname = nickname;

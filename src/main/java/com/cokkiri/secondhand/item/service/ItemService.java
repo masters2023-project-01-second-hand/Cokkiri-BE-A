@@ -24,6 +24,7 @@ public class ItemService {
 			= itemJpaRepository.findAllByCategory_Id(pageable, categoryId)
 			.map(ItemResponse::from);
 
-		return new ItemListResponse(items.getContent(), 1L, false);
+		// return new ItemListResponse(items.getContent(), 1L, false);
+		return null;
 	}
 }
