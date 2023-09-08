@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ItemListResponse {
 
-	// private String userLocation; // TODO: 현재 로그인된 유저의 위치 정보 추가하기
+	private String userLocation;
 	private List<ItemResponse> items;
-	// private boolean lastPage; // TODO: 마지막 페이지인지 여부 추가하기
+	private Long nextCursor;
 }

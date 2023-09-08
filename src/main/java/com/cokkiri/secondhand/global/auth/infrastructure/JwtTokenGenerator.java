@@ -67,7 +67,7 @@ public class JwtTokenGenerator  {
 		);
 	}
 
-	public UserInfoForJwt getUserForJwtBy(String token) {
+	public UserInfoForJwt getUserInfoForJwtBy(String token) {
 
 		String errorMessage;
 
@@ -78,8 +78,8 @@ public class JwtTokenGenerator  {
 				.parseClaimsJws(token)
 				.getBody();
 
-			return new UserInfoForJwt(
-				(String) claims.get("id"),
+			return UserInfoForJwt.generateUserInfo(
+				Long.valueOf((String) claims.get("id")),
 				(String) claims.get("userType")
 			);
 		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {

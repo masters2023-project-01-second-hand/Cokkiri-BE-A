@@ -1,7 +1,7 @@
 package com.cokkiri.secondhand.user.entity;
 
 public enum UserType {
-	NONE, GENERAL, GITHUB;
+	GUEST, GENERAL, GITHUB;
 
 	public static UserType getUserTypeBy(String name) {
 		for(UserType type : UserType.values()) {
@@ -9,6 +9,6 @@ public enum UserType {
 				return type;
 			}
 		}
-		return UserType.NONE;
+		return UserType.GUEST;
 	}
 }

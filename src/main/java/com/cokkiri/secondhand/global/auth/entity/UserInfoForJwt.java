@@ -8,43 +8,51 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import com.cokkiri.secondhand.user.entity.GeneralUser;
 import com.cokkiri.secondhand.user.entity.UserType;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class UserInfoForJwt {
 
-	private String id;
+	private Long userId;
 	private UserType userType;
-
-	public UserInfoForJwt(String id, String userTypename) {
-		this.id =id;
-		this.userType = UserType.getUserTypeBy(userTypename);
-	}
 
 	public static UserInfoForJwt from(GeneralUser user) {
 		return new UserInfoForJwt(
-			String.valueOf(user.getId()),
+			user.getId(),
 			UserType.GENERAL
 		);
+	}
+
+	public static UserInfoForJwt generateUserInfo(Long userId, String userTypename) {
+		return new UserInfoForJwt(userId, UserType.getUserTypeBy(userTypename));
+	}
+
+	public static UserInfoForJwt generateUserInfo(Long userId, UserType userType) {
+		return new UserInfoForJwt(userId, userType);
+	}
+
+	public static UserInfoForJwt generateGuestUserInfo() {
+		return new UserInfoForJwt(0L, UserType.GUEST);
 	}
 
 	public static UserInfoForJwt from(DefaultOAuth2User defaultOAuth2User) {
 		Map<String, Object> attributes = defaultOAuth2User.getAttributes();
 
 		return new UserInfoForJwt(
-			String.valueOf(attributes.get("id")),
+			(Long)attributes.get("id"),
 			UserType.GITHUB
 		);
 	}
 
-	public Map<String, String> generateClaims() {
-		return Map.of("id", id, "userType", userType.name());
+	public boolean isGuest() {
+		return this.userType == UserType.GUEST;
 	}
 
-	public Long getIdAsLong() {
-		return Long.valueOf(this.id);
+	public Map<String, String> generateClaims() {
+		return Map.of("id", String.valueOf(this.userId), "userType", userType.name());
 	}
 
 	@Override
@@ -54,11 +62,11 @@ public class UserInfoForJwt {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		UserInfoForJwt that = (UserInfoForJwt)o;
-		return Objects.equals(id, that.id) && userType == that.userType;
+		return Objects.equals(userId, that.userId) && userType == that.userType;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, userType);
+		return Objects.hash(userId, userType);
 	}
 }

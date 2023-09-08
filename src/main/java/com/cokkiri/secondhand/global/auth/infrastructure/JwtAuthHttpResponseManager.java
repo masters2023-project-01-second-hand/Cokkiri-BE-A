@@ -34,10 +34,9 @@ public class JwtAuthHttpResponseManager {
 		this.refreshHttpHeader = refreshHttpHeader;
 	}
 
-	public JwtTokenResponse setAuthHttpResponse(HttpServletResponse response, JwtTokenResponse jwtTokenResponse) {
+	public void setAuthHttpResponse(HttpServletResponse response, JwtTokenResponse jwtTokenResponse) {
 		setAccessTokenHeader(response, jwtTokenResponse.getAccessToken());
 		setRefreshTokenHeader(response, jwtTokenResponse.getRefreshToken());
-		return jwtTokenResponse;
 	}
 
 	public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {

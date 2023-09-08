@@ -1,13 +1,14 @@
 package com.cokkiri.secondhand.item.controller;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.item.dto.response.ItemListResponse;
 import com.cokkiri.secondhand.item.service.ItemService;
 
@@ -21,10 +22,13 @@ public class ItemController {
 
 	@GetMapping("/api/items")
 	public ResponseEntity<ItemListResponse> showItems(
-		@PageableDefault(size = 10, page = 0, sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
-		@RequestParam(required = false) int categoryId) {
+		HttpServletRequest request,
+		@RequestParam(name = "cursor", required = false) Long cursorId,
+		@RequestParam(required = false) Long categoryId) {
+
+		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
 
 		return ResponseEntity.ok(
-			itemService.getItemsByCategory(categoryId, pageable));
+			itemService.getItems(cursorId, categoryId, PageRequest.of(0, 10), userInfoForJwt));
 	}
 }

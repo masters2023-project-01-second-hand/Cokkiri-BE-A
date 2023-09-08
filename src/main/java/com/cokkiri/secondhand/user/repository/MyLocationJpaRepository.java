@@ -15,6 +15,8 @@ public interface MyLocationJpaRepository extends JpaRepository<MyLocation, Long>
 
 	List<MyLocation> findAllByUserId(Long userId);
 
+	List<MyLocation> findAllBySelectedIsTrueAndUserId(Long userId);
+
 	boolean existsByUserIdAndLocationId(Long userId, Long locationId);
 
 	Long countByUserId(Long userId);
@@ -24,6 +26,4 @@ public interface MyLocationJpaRepository extends JpaRepository<MyLocation, Long>
 		+ "SET is_selected = false "
 		+ "WHERE user_id = ?1", nativeQuery = true)
 	void updateAllIsSelectedToFalse(Long useId);
-
-
 }
