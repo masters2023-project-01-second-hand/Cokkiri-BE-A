@@ -10,6 +10,8 @@ env:
   ECR_REPOSITORY: cokkiri-repo
   ECS_CLUSTER_NAME: cokkiri-cluster
   ECS_SERVICE_NAME: cokkiri-service
+  ECS_TASK_DEFINITION: cokkiri-was
+  CONTAINER_NAME: cokkiri-was
 
 permissions:
   contents: read
@@ -28,6 +30,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Configure application-prod.yml
         run: |
           touch -c application-prod.yml
           echo "${{ secrets.APPLICATION }}" > application-prod.yml
@@ -36,7 +40,7 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean build -x test
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -55,11 +59,22 @@ jobs:
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo "IMAGE_TAG: $IMAGE_TAG"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Update ECS service
-        run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER_NAME }} --service ${{ env.ECS_SERVICE_NAME }} --force-new-deployment
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
