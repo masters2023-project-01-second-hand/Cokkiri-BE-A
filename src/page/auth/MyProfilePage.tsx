@@ -1,51 +1,38 @@
 import { ChangeEvent, useRef, useState } from 'react';
 import { styled } from 'styled-components';
-import { Button } from '../../components/Button';
+import { Button } from '../../components/button/Button';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { clearAuthInfo, getUserInfo } from '../../utils/localStorage';
 import { ProfileButton } from './ProfileButton';
 
 export function MyProfilePage() {
-  const userInfo = getUserInfo();
-  const { clearUserState } = useAuthStore();
+  const { nickname, profileImageUrl, clearUserState } = useAuthStore();
 
   const [file, setFile] = useState<File>();
   const [backgroundImage, setBackgroundImage] = useState<string | undefined>(
-    userInfo?.profileImageUrl
+    profileImageUrl
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const logout = () => {
-    clearAuthInfo();
     clearUserState();
   };
 
   const onChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
 
-    if (!fileList) return;
+    if (!fileList?.length) return;
 
-    if (fileList) {
-      const file = fileList[0];
+    const file = fileList[0];
 
-      if (file && file.type.startsWith('image/')) {
-        setFile(file);
-        const reader = new FileReader();
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
 
-        reader.onload = function (event) {
-          if (event.target && event.target.readyState === FileReader.DONE) {
-            setBackgroundImage(event.target.result as string);
-          }
-        };
-
-        reader.readAsDataURL(file);
-      } else {
-        event.target.value = '';
-
-        // TODO : toast alert 추가?
-        alert('이미지 파일만 업로드 가능합니다.');
-      }
+      setFile(file);
+      setBackgroundImage(url);
+    } else {
+      event.target.value = '';
+      alert('이미지 파일만 업로드 가능합니다.');
     }
   };
 
@@ -68,11 +55,16 @@ export function MyProfilePage() {
           onChangeFile={onChangeFile}
           onRemoveProfile={onRemoveProfile}
         />
-        <UserName>{userInfo?.username}</UserName>
+        <UserName>{nickname}</UserName>
         {/* TODO : 이미지 변경 시 저장 취소 버튼이 나오게한다. 취소하면 원래 이미지로, 저장하면 api 요청 */}
       </ProfileWrapper>
-      <Button styledType="container" color="accentPrimary" onClick={logout}>
-        <LogoutDiv>로그아웃</LogoutDiv>
+      <Button
+        styledType="container"
+        color="accentPrimary"
+        fontColor="accentText"
+        onClick={logout}
+      >
+        로그아웃
       </Button>
     </Div>
   );
@@ -84,19 +76,10 @@ const Div = styled.div`
   align-items: center;
   flex-direction: column;
   flex: 1;
-  margin-top: 138px;
   gap: 40px;
+  padding: 0 32px;
+  margin-top: 138px;
   background: ${({ theme }) => theme.color.accentText};
-`;
-
-const LogoutDiv = styled.div`
-  width: 297px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font: ${({ theme }) => theme.font.availableStrong16};
-  color: ${({ theme }) => theme.color.accentText};
 `;
 
 const ProfileWrapper = styled.div`

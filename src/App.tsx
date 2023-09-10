@@ -2,39 +2,22 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { styled } from 'styled-components';
 import { Layout } from './components/Layout';
+import { SellHistory } from './page/SellHistory';
 import { Test } from './page/Test';
 import { MyAccount } from './page/auth/MyAccount';
+import { OAuthLoading } from './page/auth/OAuthLoading';
 import { Home } from './page/home/Home';
-import { useAuthStore } from './stores/useAuthStore';
 import { useScreenConfigStore } from './stores/useScreenConfigStore';
-import { getAccessToken, getUserInfo } from './utils/localStorage';
 import elephantImg from '/elephant-bg.png';
 
 export function App() {
-  const { setStateAccessToken, setStateUserInfo } = useAuthStore();
   const { updateConfig } = useScreenConfigStore();
 
   useEffect(() => {
-    const accessToken = getAccessToken();
-    const userInfo = getUserInfo();
-
-    if (accessToken && userInfo) {
-      setStateAccessToken(accessToken);
-      setStateUserInfo(userInfo);
-    }
-  }, [setStateAccessToken, setStateUserInfo]);
-
-  useEffect(() => {
-    updateConfig();
-
-    window.addEventListener('resize', () => {
-      updateConfig();
-    });
+    window.addEventListener('resize', updateConfig);
 
     return () => {
-      window.removeEventListener('resize', () => {
-        updateConfig();
-      });
+      window.removeEventListener('resize', updateConfig);
     };
   }, [updateConfig]);
 
@@ -45,6 +28,12 @@ export function App() {
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<Test />} />
           <Route path="/myAccount" element={<MyAccount />} />
+          <Route path="/sellHistory" element={<SellHistory />} />
+          <Route
+            path="/oauth2/authorization/github"
+            element={<OAuthLoading />}
+          />
+          <Route path="/login/oauth2/code/github" element={<OAuthLoading />} />
         </Route>
       </Routes>
     </AppContainer>

@@ -1,34 +1,54 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
-import axios from '../../api/axios';
-import { API_ENDPOINT } from '../../api/endPoint';
-import { Button } from '../../components/Button';
+import { singup } from '../../api/authFetcher';
 import { Header } from '../../components/Header';
+import { Button } from '../../components/button/Button';
 import { Icon } from '../../components/icon/Icon';
+import { SignUpLocationModal } from '../../components/locations/SignUpLocationModal';
 import { useScreenConfigStore } from '../../stores/useScreenConfigStore';
 import { AuthInput } from './AuthInput';
 import { ProfileButton } from './ProfileButton';
+import { isValid } from './authConstant';
 
 type SignUpPanelProps = {
   closePanel: () => void;
 };
 
+type LocationState = {
+  id: number;
+  name: string;
+};
+
 export function SignUpPanel({ closePanel }: SignUpPanelProps) {
   const { screenWidth } = useScreenConfigStore();
   const [rightPosition, setRightPosition] = useState(-screenWidth);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
-  const [location, setLocation] = useState('역삼1동');
+  const [nickname, setNickname] = useState('');
+  const [location, setLocation] = useState<LocationState | null>(null);
   const [file, setFile] = useState<File>();
   const [backgroundImage, setBackgroundImage] = useState<string>();
 
-  const isValidId = /^[A-Za-z0-9]{6,20}$/.test(id);
-  const isValidPassword = /^[A-Za-z0-9]{6,20}$/.test(password);
-  const isNullLocation = location === '';
+  const isValidId = isValid(id, 'common');
+  const isValidPassword = isValid(password, 'common');
+  const isValidNickname = isValid(nickname, 'nickname');
 
-  const isSignUpDisabled = !(isValidId && isValidPassword && !isNullLocation);
+  const isNullLocation = location === null;
+
+  const isSignUpDisabled = !(
+    isValidId &&
+    isValidPassword &&
+    isValidNickname &&
+    !isNullLocation
+  );
+
+  const addSignUpLocation = (locationId: number, locationName: string) => {
+    setLocation({ id: locationId, name: locationName });
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     setRightPosition(0);
@@ -42,6 +62,10 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     setPassword(event.target.value);
   };
 
+  const onChangeNickname = (event: ChangeEvent<HTMLInputElement>) => {
+    setNickname(event.target.value);
+  };
+
   const onTransitionEndHandler = () => {
     rightPosition !== 0 && closePanel();
   };
@@ -50,38 +74,36 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     setRightPosition(-screenWidth);
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   const onChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
 
-    if (!fileList) return;
+    if (!fileList?.length) return;
 
-    if (fileList) {
-      const file = fileList[0];
+    const file = fileList[0];
 
-      if (file && file.type.startsWith('image/')) {
-        setFile(file);
-        const reader = new FileReader();
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
 
-        reader.onload = function (event) {
-          if (event.target && event.target.readyState === FileReader.DONE) {
-            setBackgroundImage(event.target.result as string);
-          }
-        };
-
-        reader.readAsDataURL(file);
-      } else {
-        event.target.value = '';
-
-        // TODO : toast alert 추가?
-        alert('이미지 파일만 업로드 가능합니다.');
-      }
+      setFile(file);
+      setBackgroundImage(url);
+    } else {
+      event.target.value = '';
+      alert('이미지 파일만 업로드 가능합니다.');
     }
   };
 
   const onRemoveProfile = () => {
-    // TODO : alert component 추가해서 사용자의 동의 받기
     setFile(undefined);
     setBackgroundImage(undefined);
+
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -91,9 +113,10 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     const formData = new FormData();
     const signupData = {
       username: id,
-      nickName: 'JayJay', // TODO : 닉네임 입력 받아 추가
+      nickname: nickname,
       password: password,
-      locationName: location,
+      locationId: location?.id,
+      locationName: location?.name,
     };
 
     formData.append(
@@ -106,12 +129,9 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
       formData.append('profileImageFile', file);
     }
 
-    const res = await axios.post(API_ENDPOINT.SIGNUP, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const res = await singup(formData);
 
+    // TODO : 에러 예외 처리
     if (res.statusText === 'OK') {
       console.log('Response:', res.data);
       closePanel();
@@ -122,17 +142,22 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     <Div $right={rightPosition} onTransitionEnd={onTransitionEndHandler}>
       <Header
         leftButton={
-          <Button styledType="ghost" onClick={onClose}>
-            <ButtonDiv>닫기</ButtonDiv>
+          <Button
+            styledType="text"
+            fontColor="neutralTextStrong"
+            onClick={onClose}
+          >
+            닫기
           </Button>
         }
         rightButton={
           <Button
-            styledType="ghost"
+            styledType="text"
+            fontColor="neutralTextStrong"
             onClick={submit}
             disabled={isSignUpDisabled}
           >
-            <ButtonDiv>완료</ButtonDiv>
+            완료
           </Button>
         }
         title="회원가입"
@@ -147,24 +172,49 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
             onRemoveProfile={onRemoveProfile}
           />
         </ProfileWrapper>
-
         <AuthInput
           id={id}
           password={password}
+          nickname={nickname}
           onChangeId={onChangeId}
           onChangePassword={onChangePassword}
+          onChangeNickname={onChangeNickname}
         />
-        <Button
-          styledType="outline"
-          color="neutralBorder"
-          onClick={() => setLocation('역삼1동')}
-        >
-          <AddLocation>
+        {location ? (
+          <Button
+            color="accentPrimary"
+            fontColor="accentText"
+            onClick={openModal}
+            align="space-between"
+          >
+            {location.name}
+            <Icon
+              name="pencil"
+              color="accentText"
+              onClick={() => {
+                console.log('삭제할까요?');
+              }}
+            />
+          </Button>
+        ) : (
+          <Button
+            styledType="outline"
+            color="neutralBorder"
+            fontColor="accentTextWeak"
+            onClick={openModal}
+          >
             <Icon name="plus" color="accentTextWeak" />
             위치 추가
-          </AddLocation>
-        </Button>
+          </Button>
+        )}
       </Body>
+      {isModalOpen && (
+        <SignUpLocationModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          addLocation={addSignUpLocation}
+        />
+      )}
     </Div>
   );
 }
@@ -189,14 +239,10 @@ const Body = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 40px;
+  gap: 15px;
   flex: 1;
   padding: 0 32px;
   margin-top: 138px;
-
-  & > button {
-    width: 100%;
-  }
 `;
 
 const ProfileWrapper = styled.div`
@@ -210,19 +256,4 @@ const ProfileWrapper = styled.div`
   & input {
     display: none;
   }
-`;
-
-const ButtonDiv = styled.div`
-  font: ${({ theme }) => theme.font.availableStrong16};
-  color: ${({ theme }) => theme.color.neutralTextStrong};
-`;
-
-const AddLocation = styled.div`
-  width: 100%;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font: ${({ theme }) => theme.font.availableStrong16};
-  color: ${({ theme }) => theme.color.accentTextWeak};
 `;

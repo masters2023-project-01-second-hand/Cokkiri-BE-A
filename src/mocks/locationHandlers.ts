@@ -1,24 +1,55 @@
 import { rest } from 'msw';
 import { API_ENDPOINT } from '../api/endPoint';
 
+type PostUserLocationRequestBody = {
+  locationId: number;
+};
+
 export const locationHandlers = [
   rest.get(API_ENDPOINT.USER_LOCATION, (_, res, ctx) => {
     return res(ctx.status(200), ctx.json(userLocations));
   }),
 
-  rest.get(API_ENDPOINT.LOCATION_DATA, (_, res, ctx) => {
-    return res(ctx.status(200), ctx.json(locationData));
+  rest.get(API_ENDPOINT.LOCATION_DATA, (req, res, ctx) => {
+    const page = parseInt(req.url.searchParams.get('page')!);
+    const pageSize = 20;
+    const cursor = (page - 1) * pageSize + 1;
+
+    const data = Array(pageSize)
+      .fill(0)
+      .map((_, i) => {
+        return {
+          id: i + cursor,
+          name: DummyLocation[(i + cursor) % 20].item,
+        };
+      });
+
+    const nextPage = cursor < 60 ? page + 1 : null;
+
+    return res(ctx.status(200), ctx.json({ locations: data, nextPage }));
   }),
 
-  rest.post(API_ENDPOINT.USER_LOCATION, (req, res, ctx) => {
-    userLocations = {
-      locations: [
-        ...userLocations.locations,
-        { id: 3, name: req.body?.name.split(' ').at(-1), isSelected: false },
-      ],
-    };
-    return res(ctx.status(200), ctx.json({ message: '동네 추가 성공' }));
-  }),
+  rest.post<PostUserLocationRequestBody>(
+    API_ENDPOINT.USER_LOCATION,
+    (req, res, ctx) => {
+      const { locationId } = req.body;
+      const newLocationName =
+        DummyLocation.find(location => location.id === (locationId % 20) + 1)
+          ?.item.split(' ')
+          .at(-1) ?? '이름없는 동네';
+      const newLocationData = {
+        id: locationId,
+        name: newLocationName,
+        isSelected: false,
+      };
+
+      userLocations = {
+        locations: [...userLocations.locations, newLocationData],
+      };
+
+      return res(ctx.status(200), ctx.json(newLocationData));
+    }
+  ),
 
   rest.patch(`${API_ENDPOINT.USER_LOCATION}/:id`, (req, res, ctx) => {
     const { id } = req.params;
@@ -59,7 +90,7 @@ let userLocations = {
   ],
 };
 
-const locationData = [
+const DummyLocation = [
   {
     id: 1,
     item: '서울특별시 송파구 가락동',
@@ -122,22 +153,22 @@ const locationData = [
   },
   {
     id: 16,
-    item: '서울특별시 서대문구 가좌로',
+    item: '서울특별시 은평구 가좌동',
   },
   {
     id: 17,
-    item: '서울특별시 종로구 가회동',
+    item: '서울특별시 은평구 가좌2동',
   },
   {
     id: 18,
-    item: '서울특별시 서대문구 간호대로',
+    item: '서울특별시 은평구 가좌3동',
   },
   {
     id: 19,
-    item: '서울특별시 용산구 갈월동',
+    item: '서울특별시 은평구 가좌4동',
   },
   {
     id: 20,
-    item: '서울특별시 은평구 갈현동',
+    item: '서울특별시 은평구 가좌5동',
   },
 ];

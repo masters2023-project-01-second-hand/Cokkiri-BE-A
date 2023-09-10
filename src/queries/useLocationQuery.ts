@@ -1,16 +1,34 @@
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import {
+  useQuery,
+  useQueryClient,
+  useMutation,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import {
   getUserLocations,
+  getLocationData,
   addUserLocation,
   deleteUserLocation,
   selectUserLocation,
-  getLocationData,
-} from '../api/fetcher';
-import { LocationData, UserLocationData } from '../types';
+} from '../api/locationFetcher';
+import { UserLocationData, LocationResultData } from '../types';
 
 const USER_LOCATION_QUERY_KEY = '/users/locations';
 const LOCATION_QUERY_KEY = '/locations';
 
+// 홈: 동네설정 지역리스트 검색
+export const useGetLocationResult = (searchParam: string) => {
+  return useInfiniteQuery<LocationResultData>(
+    [LOCATION_QUERY_KEY, searchParam],
+    ({ pageParam = 1 }) => getLocationData({ pageParam, searchParam }),
+    {
+      getNextPageParam: lastPage => lastPage.nextPage ?? undefined,
+    }
+  );
+};
+
+// 홈: 동네설정 내 동네 목록 불러오기
 export const useGetUserLocation = () => {
   return useQuery<UserLocationData>(
     [USER_LOCATION_QUERY_KEY],
@@ -18,19 +36,34 @@ export const useGetUserLocation = () => {
   );
 };
 
-export const useGetLocationData = () => {
-  return useQuery<LocationData>([LOCATION_QUERY_KEY], getLocationData);
-};
-
+// 홈: 동네설정 내 동네 추가하기
 export const useAddUserLocation = () => {
   const queryClient = useQueryClient();
+
   return useMutation(addUserLocation, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['/users/locations']);
+    onSuccess: data => {
+      queryClient.setQueryData<UserLocationData>(
+        [USER_LOCATION_QUERY_KEY],
+        prevData => {
+          return prevData
+            ? {
+                locations: [...prevData.locations, data],
+              }
+            : prevData;
+        }
+      );
+    },
+    onError: (error: AxiosError) => {
+      const statueCode = error?.response?.status;
+      if (statueCode === 500) {
+        // TODO: 토스트 메세지로 에러 표시
+        console.log('서버에서 요청이 제대로 처리되지 못했습니다.');
+      }
     },
   });
 };
 
+// 홈: 동네설정 내 동네 삭제하기
 export const useDeleteUserLocation = () => {
   const queryClient = useQueryClient();
 
@@ -50,13 +83,10 @@ export const useDeleteUserLocation = () => {
         }
       );
     },
-    // Always refetch after error or success:
-    // onSettled: () => {
-    //   queryClient.invalidateQueries(['todos']);
-    // },
   });
 };
 
+// 홈: 동네설정 내 동네 선택하기
 export const useSelectUserLocation = () => {
   const queryClient = useQueryClient();
 

@@ -1,16 +1,14 @@
 import { ChangeEvent, useState } from 'react';
 import { styled } from 'styled-components';
-import axios from '../../api/axios';
-import { API_ENDPOINT } from '../../api/endPoint';
-import { Button } from '../../components/Button';
+import { useLogin } from '../../api/authFetcher';
+import { BASE_URL } from '../../api/axios';
+import { Button } from '../../components/button/Button';
 import { Icon } from '../../components/icon/Icon';
-import { useAuthStore } from '../../stores/useAuthStore';
-import { setAccessToken, setUserInfo } from '../../utils/localStorage';
 import { AuthInput } from './AuthInput';
 import { SignUpPanel } from './SignUpPanel';
 
 export function LoginPage() {
-  const { setStateAccessToken, setStateUserInfo } = useAuthStore();
+  const { login } = useLogin();
 
   const [isOpenPanel, setIsOpenPanel] = useState(false);
   const [id, setId] = useState('');
@@ -38,21 +36,16 @@ export function LoginPage() {
   };
 
   const submit = async () => {
-    const res = await axios.post(API_ENDPOINT.LOGIN, {
+    const res = await login({
       username: id,
       password,
     });
 
-    if (res.statusText === 'OK') {
-      const data = res.data;
-      const { accessToken, ...userInfo } = data;
+    console.log(res);
+  };
 
-      setAccessToken(accessToken);
-      setUserInfo(userInfo);
-
-      setStateAccessToken(accessToken);
-      setStateUserInfo(userInfo);
-    }
+  const OAuthLogin = async () => {
+    window.location.assign(`${BASE_URL}/oauth2/authorization/github`);
   };
 
   return (
@@ -61,15 +54,13 @@ export function LoginPage() {
       <Div>
         <Body>
           <Button
+            style={{ height: 42 }}
             styledType="outline"
             color="neutralTextStrong"
-            onClick={submit}
-            disabled={isLoginDisabled}
+            onClick={OAuthLogin}
           >
-            <OauthDiv>
-              <Icon name="octocat" color="accentText" />
-              GitHub 로그인
-            </OauthDiv>
+            <Icon name="octocat" color="accentText" />
+            GitHub 로그인
           </Button>
           <DividerContainer>
             <DividerLine />
@@ -86,14 +77,15 @@ export function LoginPage() {
             <Button
               styledType="container"
               color="accentPrimary"
+              fontColor="accentText"
               onClick={submit}
               disabled={isLoginDisabled}
             >
-              <LoginDiv>로그인</LoginDiv>
+              로그인
             </Button>
 
-            <Button styledType="ghost" onClick={openPanel}>
-              <SignUpDiv>회원가입</SignUpDiv>
+            <Button size="M" styledType="text" onClick={openPanel}>
+              회원가입
             </Button>
           </ButtonWrapper>
         </Body>
@@ -119,37 +111,6 @@ const Body = styled.div`
   gap: 24px;
   flex: 1;
   padding: 0 32px;
-`;
-
-const LoginDiv = styled.div`
-  width: 297px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font: ${({ theme }) => theme.font.availableStrong16};
-  color: ${({ theme }) => theme.color.accentText};
-`;
-
-const OauthDiv = styled.div`
-  width: 297px;
-  height: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  font: ${({ theme }) => theme.font.availableStrong16};
-  color: ${({ theme }) => theme.color.neutralTextStrong};
-`;
-
-const SignUpDiv = styled.div`
-  width: 45px;
-  height: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font: ${({ theme }) => theme.font.availableStrong12};
-  color: ${({ theme }) => theme.color.neutralText};
 `;
 
 const ButtonWrapper = styled.div`
