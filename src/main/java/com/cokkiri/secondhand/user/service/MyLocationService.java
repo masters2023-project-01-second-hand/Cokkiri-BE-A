@@ -35,14 +35,15 @@ public class MyLocationService {
 
 	public MyLocationListResponse getMyLocationByUserId(UserInfoForJwt userInfoForJwt) {
 
-		List<MyLocationResponse> locations
-			= myLocationJpaRepository.findAllByUserId(
-				userInfoForJwt.getUserId()).stream()
+		List<MyLocation> myLocations
+			= myLocationJpaRepository.findAllByUserId(userInfoForJwt.getUserId());
+
+		List<MyLocationResponse> mySelectedLocations = myLocations.stream()
 			.filter(myLocation -> !myLocation.isSelected())
 			.map(MyLocationResponse::from)
 			.collect(Collectors.toUnmodifiableList());
 
-		return new MyLocationListResponse(locations);
+		return new MyLocationListResponse(mySelectedLocations);
 	}
 
 	@Transactional

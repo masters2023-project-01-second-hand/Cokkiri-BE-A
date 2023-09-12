@@ -65,8 +65,10 @@ class MyLocationControllerTest {
 					.requestAttr("userInfoForJwt", userInfoForJwt)
 					.characterEncoding("utf-8")
 			).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.locations").isArray());
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.locations").isArray()
+				);
 		}
 	}
 
@@ -96,10 +98,12 @@ class MyLocationControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.characterEncoding("utf-8")
 			).andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").isNumber())
-				.andExpect(jsonPath("$.name").isString())
-				.andExpect(jsonPath("$.isSelected").isBoolean());
+				.andExpectAll(
+					status().isOk(),
+					jsonPath("$.id").isNumber(),
+					jsonPath("$.name").isString(),
+					jsonPath("$.isSelected").isBoolean()
+				);
 		}
 
 		@DisplayName("내 동네 목록이 3개일 경우 더이상 추가할 수 없다. 409 Conflict 에러를 반환한다.")
@@ -120,8 +124,10 @@ class MyLocationControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8")
 				).andDo(print())
-				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isConflict(),
+						jsonPath("$.message").value(exception.getMessage())
+				);
 		}
 
 		@DisplayName("이미 추가된 동네는 내 동네 목록에 추가할 수 없다. 409 Conflict 에러를 반환한다.")
@@ -142,8 +148,10 @@ class MyLocationControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8")
 				).andDo(print())
-				.andExpect(status().isConflict())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isConflict(),
+						jsonPath("$.message").value(exception.getMessage())
+					);
 		}
 
 		@DisplayName("존재하지 않는 지역을 추가하면 404 Not Found 에러를 반환한다.")
@@ -164,8 +172,10 @@ class MyLocationControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.characterEncoding("utf-8")
 				).andDo(print())
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isNotFound(),
+						jsonPath("$.message").value(exception.getMessage())
+					);
 		}
 	}
 
@@ -212,8 +222,10 @@ class MyLocationControllerTest {
 					patch("/api/users/locations/" + myLocationId)
 						.requestAttr("userInfoForJwt", userInfoForJwt)
 				).andDo(print())
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isNotFound(),
+						jsonPath("$.message").value(exception.getMessage())
+					);
 		}
 	}
 
@@ -249,8 +261,10 @@ class MyLocationControllerTest {
 				delete("/api/users/locations/" + myLocationId)
 					.requestAttr("userInfoForJwt", userInfoForJwt)
 			).andDo(print())
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+				.andExpectAll(
+					status().isBadRequest(),
+					jsonPath("$.message").value(exception.getMessage())
+				);
 		}
 
 		@DisplayName("이미 선택된 동네를 삭제하면 4xx에러를 반환한다.")
@@ -268,8 +282,10 @@ class MyLocationControllerTest {
 					delete("/api/users/locations/" + myLocationId)
 						.requestAttr("userInfoForJwt", userInfoForJwt)
 				).andDo(print())
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isBadRequest(),
+						jsonPath("$.message").value(exception.getMessage())
+					);
 		}
 
 		@DisplayName("내 동네 목록에 없는 동네를 삭제하면 404 Not Found 에러를 반환한다.")
@@ -287,8 +303,10 @@ class MyLocationControllerTest {
 					delete("/api/users/locations/" + myLocationId)
 						.requestAttr("userInfoForJwt", userInfoForJwt)
 				).andDo(print())
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.message").value(exception.getMessage()));
+					.andExpectAll(
+						status().isNotFound(),
+						jsonPath("$.message").value(exception.getMessage())
+					);
 		}
 	}
 }
