@@ -8,11 +8,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.global.exception.list.NotFoundItemException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
+import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemListResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemResponse;
+import com.cokkiri.secondhand.item.entity.Item;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.repository.ItemDslRepository;
+import com.cokkiri.secondhand.item.repository.ItemJpaRepository;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.MyLocationList;
 import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
@@ -23,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class ItemService {
 
+	private final ItemJpaRepository itemJpaRepository;
 	private final ItemDslRepository itemDslRepository;
 	private final LocationJpaRepository locationJpaRepository;
 	private final MyLocationJpaRepository myLocationJpaRepository;
@@ -64,5 +69,14 @@ public class ItemService {
 		if (items.size() < pageable.getPageSize()) return null;
 
 		return items.get(items.size()-1).getId();
+	}
+
+	public ItemDetailResponse getItemDetail(Long itemId) {
+
+		Item item = itemJpaRepository.findById(itemId).orElseThrow(
+			() -> new NotFoundItemException(itemId)
+		);
+
+		return ItemDetailResponse.from(item);
 	}
 }
