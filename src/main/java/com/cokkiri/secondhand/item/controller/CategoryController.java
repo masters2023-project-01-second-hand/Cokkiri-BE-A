@@ -20,4 +20,10 @@ public class CategoryController {
 
 		return ResponseEntity.ok(categoryService.getAllCategories());
 	}
+
+	@GetMapping("/api/categories/recommend")
+	public ResponseEntity<CategoryListResponse> getRecommendedCategories() {
+
+		return ResponseEntity.ok(categoryService.getRecommendedCategories());
+	}
 }
