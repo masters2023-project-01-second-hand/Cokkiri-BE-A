@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -59,6 +60,9 @@ public class Item {
 	@OneToOne
 	@JoinColumn(name = "metadata_id")
 	private ItemMetadata itemMetadata;
+
+	@OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
+	private ItemContent itemContent;
 
 	public Long findSellerId() {
 		return seller.getId();

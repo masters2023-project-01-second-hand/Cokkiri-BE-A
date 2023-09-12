@@ -5,10 +5,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemListResponse;
 import com.cokkiri.secondhand.item.service.ItemService;
 
@@ -30,5 +32,13 @@ public class ItemController {
 
 		return ResponseEntity.ok(
 			itemService.getItems(cursorId, categoryId, PageRequest.of(0, 10), userInfoForJwt));
+	}
+
+	@GetMapping("/api/items/{itemId}")
+	public ResponseEntity<ItemDetailResponse> showItemDetail(@PathVariable Long itemId) {
+
+		return ResponseEntity.ok(
+			itemService.getItemDetail(itemId)
+		);
 	}
 }
