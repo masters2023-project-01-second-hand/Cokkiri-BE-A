@@ -21,7 +21,7 @@ public class ItemContent {
 
 	@Id
 	@Column(name = "item_id")
-	private Long itemId;
+	private Long id;
 
 	@MapsId
 	@OneToOne
