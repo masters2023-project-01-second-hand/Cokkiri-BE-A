@@ -35,10 +35,13 @@ public class ItemController {
 	}
 
 	@GetMapping("/api/items/{itemId}")
-	public ResponseEntity<ItemDetailResponse> showItemDetail(@PathVariable Long itemId) {
+	public ResponseEntity<ItemDetailResponse> showItemDetail(
+		HttpServletRequest request, @PathVariable Long itemId) {
+
+		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
 
 		return ResponseEntity.ok(
-			itemService.getItemDetail(itemId)
+			itemService.getItemDetail(userInfoForJwt, itemId)
 		);
 	}
 }

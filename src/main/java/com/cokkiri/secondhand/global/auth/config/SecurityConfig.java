@@ -47,7 +47,8 @@ public class SecurityConfig {
 			.antMatchers(
 				"/api/users",
 				"/api/login",
-				"/api/reissue-access-token").permitAll() // White URI List
+				"/api/reissue-access-token",
+				"/api/locations").permitAll() // White URI List
 			.antMatchers(
 				"/api/items").permitAll() // Public URI List
 			.anyRequest().authenticated()

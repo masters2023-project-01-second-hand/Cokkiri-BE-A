@@ -57,8 +57,7 @@ public class Item {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	@OneToOne
-	@JoinColumn(name = "metadata_id")
+	@OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
 	private ItemMetadata itemMetadata;
 
 	@OneToOne(mappedBy = "item", fetch = FetchType.LAZY)

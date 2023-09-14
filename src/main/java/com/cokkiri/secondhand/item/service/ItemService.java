@@ -32,6 +32,8 @@ public class ItemService {
 	private final LocationJpaRepository locationJpaRepository;
 	private final MyLocationJpaRepository myLocationJpaRepository;
 
+	private final ItemMetadataService itemMetadataService;
+
 	@Transactional(readOnly = true)
 	public ItemListResponse getItems(Long cursorId, Long categoryId, Pageable pageable, UserInfoForJwt userInfoForJwt) {
 
@@ -71,11 +73,14 @@ public class ItemService {
 		return items.get(items.size()-1).getId();
 	}
 
-	public ItemDetailResponse getItemDetail(Long itemId) {
+	@Transactional
+	public ItemDetailResponse getItemDetail(UserInfoForJwt userInfo, Long itemId) {
 
 		Item item = itemJpaRepository.findById(itemId).orElseThrow(
 			() -> new NotFoundItemException(itemId)
 		);
+
+		itemMetadataService.increaseHitCount(userInfo, item);
 
 		return ItemDetailResponse.from(item);
 	}
