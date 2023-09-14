@@ -30,4 +30,25 @@ public class ItemMetadataService {
 			itemMetadataJpaRepository.save(metadata);
 		}
 	}
+
+	@Transactional
+	public void increaseFavoriteCount(Item item) {
+		ItemMetadata metadata = itemMetadataJpaRepository.findByIdWithPessimisticLock(item.getId())
+			.orElse(new ItemMetadata(item));
+
+		metadata.increaseFavorite();
+
+		itemMetadataJpaRepository.save(metadata);
+	}
+
+	@Transactional
+	public void decreaseFavoriteCount(Item item) {
+		ItemMetadata metadata = itemMetadataJpaRepository.findByIdWithPessimisticLock(item.getId())
+			.orElse(new ItemMetadata(item));
+
+		metadata.decreaseFavorite();
+
+		itemMetadataJpaRepository.save(metadata);
+	}
+
 }

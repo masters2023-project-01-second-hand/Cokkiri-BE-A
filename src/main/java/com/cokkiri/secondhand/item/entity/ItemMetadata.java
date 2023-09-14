@@ -41,4 +41,16 @@ public class ItemMetadata {
 	public void increaseHit() {
 		this.hit++;
 	}
+
+	public void increaseFavorite() {
+		this.favorite++;
+	}
+
+	public void decreaseFavorite() {
+		if (favorite <= 0) {
+			this.favorite = 0L;
+			return;
+		}
+		this.favorite--;
+	}
 }
