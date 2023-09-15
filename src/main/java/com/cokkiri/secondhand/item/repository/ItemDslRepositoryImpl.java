@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.cokkiri.secondhand.item.entity.Item;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -26,12 +25,6 @@ public class ItemDslRepositoryImpl implements ItemDslRepository {
 	}
 
 	public List<Item> findAllByLocationId(Pageable pageable, Long locationId, Long cursorId) {
-
-		BooleanBuilder dynamicLtId = new BooleanBuilder();
-
-		if (cursorId != null) {
-			dynamicLtId.and(item.id.lt(cursorId));
-		}
 
 		return queryFactory
 			.selectFrom(item)
@@ -54,6 +47,31 @@ public class ItemDslRepositoryImpl implements ItemDslRepository {
 					cursorCondition(cursorId)
 					, category.id.eq(categoryId)
 					, location.id.eq(locationId))
+			.orderBy(item.id.desc())
+			.limit(pageable.getPageSize())
+			.fetch();
+	}
+
+	public List<Item> findAllBySellerId(Pageable pageable, Long sellerId, Long cursorId) {
+
+		return queryFactory
+			.selectFrom(item)
+			.where(
+				cursorCondition(cursorId)
+				, item.seller.id.eq(sellerId))
+			.orderBy(item.id.desc())
+			.limit(pageable.getPageSize())
+			.fetch();
+	}
+
+	public List<Item> findAllBySellerIdAndStatusId(Pageable pageable, Long sellerId, Long statusId, Long cursorId) {
+
+		return queryFactory
+			.selectFrom(item)
+			.where(
+				cursorCondition(cursorId)
+				, item.seller.id.eq(sellerId)
+				, item.status.id.eq(statusId))
 			.orderBy(item.id.desc())
 			.limit(pageable.getPageSize())
 			.fetch();
