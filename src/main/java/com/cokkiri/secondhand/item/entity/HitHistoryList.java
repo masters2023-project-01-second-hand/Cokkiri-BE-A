@@ -16,7 +16,7 @@ public class HitHistoryList {
 
 	public static HitHistoryList from(Item item) {
 		List<HitHistory> hitHistories = new ArrayList<>();
-		hitHistories.add(new HitHistory(item.getId(), LocalDateTime.now()));
+		hitHistories.add(new HitHistory(item.getId(), LocalDateTime.now().plusDays(1)));
 
 		return new HitHistoryList(hitHistories);
 	}
@@ -27,12 +27,12 @@ public class HitHistoryList {
 			return false;
 		}
 
-		return hitHistories.add(new HitHistory(item.getId(), LocalDateTime.now()));
+		return hitHistories.add(new HitHistory(item.getId(), LocalDateTime.now().plusDays(1)));
 	}
 
 	private boolean isHit(Long itemId) {
 		return hitHistories.stream()
-			.anyMatch(hitHistory -> hitHistory.getItemId().equals(itemId));
+			.anyMatch(hitHistory -> hitHistory.getItemId().equals(itemId) && !hitHistory.isExpired());
 	}
 
 	public void removeAllExpiredHitHistory() {
