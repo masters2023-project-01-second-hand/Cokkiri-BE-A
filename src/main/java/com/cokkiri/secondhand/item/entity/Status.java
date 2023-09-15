@@ -8,8 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum Status {
-	SALE("판매중"), RESERVATION("예약중"), SOLD_OUT("판매완료");
+	SALE(1L, "판매중"), RESERVATION(2L, "예약중"), SOLD_OUT(3L, "판매완료");
 
+	private final Long id;
 	private final String name;
 
 	public static Status parseBy(String name) {

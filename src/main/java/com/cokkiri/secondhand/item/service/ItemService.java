@@ -13,11 +13,14 @@ import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundUserException;
 import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemFavoriteResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemForUserResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemListForUserResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemListResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemResponse;
 import com.cokkiri.secondhand.item.entity.Favorite;
 import com.cokkiri.secondhand.item.entity.Item;
 import com.cokkiri.secondhand.item.entity.Location;
+import com.cokkiri.secondhand.item.entity.Status;
 import com.cokkiri.secondhand.item.repository.FavoriteJpaRepository;
 import com.cokkiri.secondhand.item.repository.ItemDslRepository;
 import com.cokkiri.secondhand.item.repository.ItemJpaRepository;
@@ -61,6 +64,36 @@ public class ItemService {
 		return new ItemListResponse(location.getDepth3(), items, calculateNextPage(items, pageable));
 	}
 
+	@Transactional(readOnly = true)
+	public ItemListForUserResponse getItemsForUser(String nickname, Boolean isSold, Long cursorId, Pageable pageable) {
+
+		UserEntity user = userEntityJpaRepository.findByNickname(nickname)
+			.orElseThrow(() -> new NotFoundUserException(nickname));
+
+		List<ItemForUserResponse> items;
+
+		if (isSold == null) {
+			items = itemDslRepository.findAllBySellerId(pageable, user.getId(), cursorId).stream()
+				.map(ItemForUserResponse::from)
+				.collect(Collectors.toList());
+
+			return new ItemListForUserResponse(items, calculateNextPageForUser(items, pageable));
+		}
+
+		Status status;
+		if (isSold) {
+			status = Status.SOLD_OUT;
+		} else {
+			status = Status.SALE;
+		}
+
+		items = itemDslRepository.findAllBySellerIdAndStatusId(pageable, user.getId(), status.getId(), cursorId).stream()
+			.map(ItemForUserResponse::from)
+			.collect(Collectors.toList());
+
+		return new ItemListForUserResponse(items, calculateNextPageForUser(items, pageable));
+	}
+
 	private Location findLocation(UserInfoForJwt userInfoForJwt) {
 
 		if(userInfoForJwt.isGuest()) {
@@ -74,6 +107,14 @@ public class ItemService {
 	}
 
 	private Long calculateNextPage(List<ItemResponse> items, Pageable pageable) {
+		if (items.isEmpty()) return null;
+
+		if (items.size() < pageable.getPageSize()) return null;
+
+		return items.get(items.size()-1).getId();
+	}
+
+	private Long calculateNextPageForUser(List<ItemForUserResponse> items, Pageable pageable) {
 		if (items.isEmpty()) return null;
 
 		if (items.size() < pageable.getPageSize()) return null;
