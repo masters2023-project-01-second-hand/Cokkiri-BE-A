@@ -22,4 +22,8 @@ public enum Status {
 				throw new IllegalStatusException(name);
 		}
 	}
+
+	public static Status determineStatusIsSold(boolean isSold) {
+		return isSold? Status.SOLD_OUT : Status.SALE;
+	}
 }

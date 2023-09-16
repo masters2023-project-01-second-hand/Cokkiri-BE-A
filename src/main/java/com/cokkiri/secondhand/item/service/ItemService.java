@@ -72,24 +72,17 @@ public class ItemService {
 
 		List<ItemForUserResponse> items;
 
-		if (isSold == null) {
+		Status status = (isSold == null)? null : Status.determineStatusIsSold(isSold);
+
+		if (status == null) {
 			items = itemDslRepository.findAllBySellerId(pageable, user.getId(), cursorId).stream()
 				.map(ItemForUserResponse::from)
 				.collect(Collectors.toList());
-
-			return new ItemListForUserResponse(items, calculateNextPageForUser(items, pageable));
-		}
-
-		Status status;
-		if (isSold) {
-			status = Status.SOLD_OUT;
 		} else {
-			status = Status.SALE;
+			items = itemDslRepository.findAllBySellerIdAndStatusId(pageable, user.getId(), status.getId(), cursorId).stream()
+				.map(ItemForUserResponse::from)
+				.collect(Collectors.toList());
 		}
-
-		items = itemDslRepository.findAllBySellerIdAndStatusId(pageable, user.getId(), status.getId(), cursorId).stream()
-			.map(ItemForUserResponse::from)
-			.collect(Collectors.toList());
 
 		return new ItemListForUserResponse(items, calculateNextPageForUser(items, pageable));
 	}
