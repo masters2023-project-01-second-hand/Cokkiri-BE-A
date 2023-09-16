@@ -1,7 +1,6 @@
 package com.cokkiri.secondhand.user.dto.response;
 
 import com.cokkiri.secondhand.user.entity.MyLocation;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,6 @@ public class MyLocationResponse {
 
 	private Long id;
 	private String name;
-	@JsonProperty("isSelected")
 	private Boolean isSelected;
 
 	public static MyLocationResponse from(MyLocation myLocation) {
