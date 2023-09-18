@@ -43,3 +43,22 @@ export type LocationResultData = {
   }[];
   nextPage: number | null;
 };
+
+export type FavoritesCategoryTabsType = {
+  id?: number;
+  name: string;
+};
+
+export type FavoritesCategoryDataType = {
+  categories: FavoritesCategoryTabsType[];
+};
+
+export type CategoryData = {
+  categories: CategoryItem[];
+};
+
+export type CategoryItem = {
+  id: number;
+  name: string;
+  iconName: string;
+};

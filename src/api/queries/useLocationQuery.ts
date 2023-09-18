@@ -1,21 +1,22 @@
 import {
+  useInfiniteQuery,
+  useMutation,
   useQuery,
   useQueryClient,
-  useMutation,
-  useInfiniteQuery,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { useToastStore } from '../../stores/useToastStore';
+import { LocationResultData, UserLocationData } from '../../types';
 import {
-  getUserLocations,
-  getLocationData,
   addUserLocation,
   deleteUserLocation,
+  getLocationData,
+  getUserLocations,
   selectUserLocation,
-} from '../api/locationFetcher';
-import { UserLocationData, LocationResultData } from '../types';
+} from '../fetchers/locationFetcher';
 
-const USER_LOCATION_QUERY_KEY = '/users/locations';
-const LOCATION_QUERY_KEY = '/locations';
+const USER_LOCATION_QUERY_KEY = 'userLocations';
+const LOCATION_QUERY_KEY = 'locations';
 
 // 홈: 동네설정 지역리스트 검색
 export const useGetLocationResult = (searchParam: string) => {
@@ -26,6 +27,15 @@ export const useGetLocationResult = (searchParam: string) => {
       getNextPageParam: lastPage => lastPage.nextPage ?? undefined,
     }
   );
+};
+
+export const useResetLocationResult = () => {
+  const queryClient = useQueryClient();
+  return () =>
+    queryClient.resetQueries({
+      queryKey: [LOCATION_QUERY_KEY],
+      exact: false,
+    });
 };
 
 // 홈: 동네설정 내 동네 목록 불러오기
@@ -39,6 +49,7 @@ export const useGetUserLocation = () => {
 // 홈: 동네설정 내 동네 추가하기
 export const useAddUserLocation = () => {
   const queryClient = useQueryClient();
+  const showToast = useToastStore(state => state.showToast);
 
   return useMutation(addUserLocation, {
     onSuccess: data => {
@@ -56,8 +67,10 @@ export const useAddUserLocation = () => {
     onError: (error: AxiosError) => {
       const statueCode = error?.response?.status;
       if (statueCode === 500) {
-        // TODO: 토스트 메세지로 에러 표시
-        console.log('서버에서 요청이 제대로 처리되지 못했습니다.');
+        showToast({
+          type: 'error',
+          message: '서버에서 요청이 제대로 처리되지 못했습니다.',
+        });
       }
     },
   });

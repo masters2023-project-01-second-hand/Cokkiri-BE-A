@@ -1,5 +1,8 @@
-import { ForwardedRef, forwardRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
+import { useGetItemDetailsEdit } from '../api/queries/useItemDetailsQuery';
+import { useProductEditorStore } from '../stores/useProductEditorStore';
+import { useToastStore } from '../stores/useToastStore';
 import { addCommasToNumber } from '../utils/addCommasToNumber';
 import { getElapsedSince } from '../utils/getElapsedSince';
 import { Badge } from './Badge';
@@ -22,20 +25,21 @@ type ItemProps = {
   isSeller: boolean;
 };
 
-export const ProductItem = forwardRef(function ProductItem(
-  {
-    id,
-    title,
-    locationName,
-    createdAt,
-    statusName,
-    price,
-    countData,
-    thumbnailUrl,
-    isSeller,
-  }: ItemProps,
-  ref: ForwardedRef<HTMLDivElement>
-) {
+export function ProductItem({
+  id,
+  title,
+  locationName,
+  createdAt,
+  statusName,
+  price,
+  countData,
+  thumbnailUrl,
+  isSeller,
+}: ItemProps) {
+  const navigate = useNavigate();
+  const showToast = useToastStore(state => state.showToast);
+  const openEditorPanel = useProductEditorStore(state => state.openPanel);
+  const { data, isError, isLoading, refetch } = useGetItemDetailsEdit(id);
   const { chat, favorite } = countData;
 
   const setPrice = (price: number | null) => {
@@ -49,10 +53,29 @@ export const ProductItem = forwardRef(function ProductItem(
     }
   };
 
+  const hoverToFetch = () => {
+    if (!data && !isError) {
+      refetch();
+    }
+  };
+
   // TODO: 각 드롭다운 메뉴 아이템들에 맞는 액션 추가하기
   const dropdownActions = {
     edit: () => {
-      console.log('게시글 수정');
+      if (!data || isLoading) {
+        showToast({
+          type: 'warning',
+          message: '문제 발생! 다시 시도해 주세요!',
+        });
+        return;
+      } else if (isError) {
+        showToast({
+          type: 'error',
+          message: '에러 발생!',
+        });
+        return;
+      }
+      openEditorPanel({ mode: 'edit', data: data, id: id });
     },
     reserved: () => {
       console.log('예약중');
@@ -65,35 +88,36 @@ export const ProductItem = forwardRef(function ProductItem(
     },
   };
 
+  const showItemDetails = (itemid: number) => {
+    navigate(`/items/${itemid}`);
+  };
+
   return (
-    <Div
-      ref={ref}
-      onClick={() => {
-        console.log(id);
-      }}
-    >
+    <Div onClick={() => showItemDetails(id)}>
       <Thumbnail src={thumbnailUrl} />
       <Information>
         <Title>
           <span>{title}</span>
           {isSeller && (
-            <Dropdown iconName="dots" align="right">
-              <MenuItem onAction={dropdownActions['edit']}>
-                게시글 수정
-              </MenuItem>
-              <MenuItem onAction={dropdownActions['reserved']}>
-                예약중 상태로 전환
-              </MenuItem>
-              <MenuItem onAction={dropdownActions['sold']}>
-                판매완료 상태로 전환
-              </MenuItem>
-              <MenuItem
-                color="systemWarning"
-                onAction={dropdownActions['delete']}
-              >
-                삭제
-              </MenuItem>
-            </Dropdown>
+            <div onMouseOver={hoverToFetch}>
+              <Dropdown iconName="dots" align="right">
+                <MenuItem onAction={dropdownActions['edit']}>
+                  <div>게시글 수정</div>
+                </MenuItem>
+                <MenuItem onAction={dropdownActions['reserved']}>
+                  예약중 상태로 전환
+                </MenuItem>
+                <MenuItem onAction={dropdownActions['sold']}>
+                  판매완료 상태로 전환
+                </MenuItem>
+                <MenuItem
+                  color="systemWarning"
+                  onAction={dropdownActions['delete']}
+                >
+                  삭제
+                </MenuItem>
+              </Dropdown>
+            </div>
           )}
         </Title>
         <LocationAndTimestamp>
@@ -121,14 +145,14 @@ export const ProductItem = forwardRef(function ProductItem(
           {favorite > 0 && (
             <CountWrapper>
               <Icon name="heart" color="neutralTextWeak" />
-              {chat}
+              {favorite}
             </CountWrapper>
           )}
         </History>
       </Information>
     </Div>
   );
-});
+}
 
 const Div = styled.div`
   width: 100%;
@@ -160,6 +184,7 @@ const Information = styled.div`
   & > div {
     width: 100%;
     display: flex;
+    align-items: center;
   }
 `;
 

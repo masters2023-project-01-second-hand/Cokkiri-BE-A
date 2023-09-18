@@ -1,11 +1,13 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
-import { singup } from '../../api/authFetcher';
+import { singup } from '../../api/fetchers/authFetcher';
+import { useResetLocationResult } from '../../api/queries/useLocationQuery';
 import { Header } from '../../components/Header';
 import { Button } from '../../components/button/Button';
 import { Icon } from '../../components/icon/Icon';
 import { SignUpLocationModal } from '../../components/locations/SignUpLocationModal';
 import { useScreenConfigStore } from '../../stores/useScreenConfigStore';
+import { useToastStore } from '../../stores/useToastStore';
 import { AuthInput } from './AuthInput';
 import { ProfileButton } from './ProfileButton';
 import { isValid } from './authConstant';
@@ -21,6 +23,8 @@ type LocationState = {
 
 export function SignUpPanel({ closePanel }: SignUpPanelProps) {
   const { screenWidth } = useScreenConfigStore();
+  const showToast = useToastStore(state => state.showToast);
+
   const [rightPosition, setRightPosition] = useState(-screenWidth);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +35,8 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
   const [location, setLocation] = useState<LocationState | null>(null);
   const [file, setFile] = useState<File>();
   const [backgroundImage, setBackgroundImage] = useState<string>();
+
+  const resetLocationResult = useResetLocationResult();
 
   const isValidId = isValid(id, 'common');
   const isValidPassword = isValid(password, 'common');
@@ -44,11 +50,6 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     isValidNickname &&
     !isNullLocation
   );
-
-  const addSignUpLocation = (locationId: number, locationName: string) => {
-    setLocation({ id: locationId, name: locationName });
-    setIsModalOpen(false);
-  };
 
   useEffect(() => {
     setRightPosition(0);
@@ -79,6 +80,7 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
   };
 
   const closeModal = () => {
+    resetLocationResult();
     setIsModalOpen(false);
   };
 
@@ -130,12 +132,17 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     }
 
     const res = await singup(formData);
-
+    console.log(res);
     // TODO : 에러 예외 처리
-    if (res.statusText === 'OK') {
-      console.log('Response:', res.data);
+    if (res.status === 201) {
+      showToast({ type: 'success', message: '회원가입 성공!' });
       closePanel();
     }
+  };
+
+  const setSignUpLocation = (locationId: number, locationName: string) => {
+    setLocation({ id: locationId, name: locationName });
+    setIsModalOpen(false);
   };
 
   return (
@@ -212,7 +219,7 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
         <SignUpLocationModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          addLocation={addSignUpLocation}
+          setSignUpLocation={setSignUpLocation}
         />
       )}
     </Div>
