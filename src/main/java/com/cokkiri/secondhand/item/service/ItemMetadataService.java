@@ -46,6 +46,10 @@ public class ItemMetadataService {
 		ItemMetadata metadata = itemMetadataJpaRepository.findByIdWithPessimisticLock(item.getId())
 			.orElse(new ItemMetadata(item));
 
+		if (metadata.getFavorite() <= 0L) {
+			return;
+		}
+
 		metadata.decreaseFavorite();
 
 		itemMetadataJpaRepository.save(metadata);

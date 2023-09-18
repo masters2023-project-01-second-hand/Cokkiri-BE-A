@@ -3,8 +3,6 @@ package com.cokkiri.secondhand.global.auth.infrastructure;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
@@ -12,10 +10,11 @@ import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.list.NotExistRefreshTokenException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class MemoryJwtRepository { // TODO: 추후 Redis로 변경하기
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(MemoryJwtRepository.class);
 
 	private static final Map<UserInfoForJwt, JwtRefreshToken> refreshTokenStorage = new ConcurrentHashMap<>();
 
@@ -45,7 +44,8 @@ public class MemoryJwtRepository { // TODO: 추후 Redis로 변경하기
 	@Scheduled(initialDelay = 1000 * 60 * 60 * 24, fixedDelay = 1000 * 60 * 60)
 	public void removeAllExpiredRefreshTokens() {
 
-		LOGGER.info("removeAllExpiredRefreshTokens");
+		log.info("removeAllExpiredRefreshTokens");
+
 		for (UserInfoForJwt userInfoForJwt : refreshTokenStorage.keySet()) {
 			if (refreshTokenStorage.get(userInfoForJwt).isExpired()) {
 				refreshTokenStorage.remove(userInfoForJwt);

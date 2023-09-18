@@ -1,8 +1,6 @@
 package com.cokkiri.secondhand.item.repository;
 
-import static com.cokkiri.secondhand.item.entity.QCategory.*;
 import static com.cokkiri.secondhand.item.entity.QItem.*;
-import static com.cokkiri.secondhand.item.entity.QLocation.*;
 
 import java.util.List;
 
@@ -12,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.cokkiri.secondhand.item.entity.Item;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Repository
@@ -26,58 +24,55 @@ public class ItemDslRepositoryImpl implements ItemDslRepository {
 
 	public List<Item> findAllByLocationId(Pageable pageable, Long locationId, Long cursorId) {
 
-		return queryFactory
-			.selectFrom(item)
-			.leftJoin(location).on(location.id.eq(item.location.id))
-			.where(
-				cursorCondition(cursorId),
-				location.id.eq(locationId))
-			.orderBy(item.id.desc())
-			.limit(pageable.getPageSize())
-			.fetch();
+		BooleanBuilder builder = generateBooleanBuilderWithCursorCondition(cursorId)
+			.and(item.location.id.eq(locationId));
+
+		return findAllBy(pageable, builder);
 	}
 
 	public List<Item> findAllByCategoryIdAndLocationId(Pageable pageable, Long categoryId, Long locationId, Long cursorId) {
 
-		return queryFactory
-			.selectFrom(item)
-			.leftJoin(category).on(category.id.eq(item.category.id))
-			.leftJoin(location).on(location.id.eq(item.location.id))
-			.where(
-					cursorCondition(cursorId)
-					, category.id.eq(categoryId)
-					, location.id.eq(locationId))
-			.orderBy(item.id.desc())
-			.limit(pageable.getPageSize())
-			.fetch();
+		BooleanBuilder builder = generateBooleanBuilderWithCursorCondition(cursorId)
+			.and(item.category.id.eq(categoryId))
+			.and(item.location.id.eq(locationId));
+
+		return findAllBy(pageable, builder);
 	}
 
 	public List<Item> findAllBySellerId(Pageable pageable, Long sellerId, Long cursorId) {
 
-		return queryFactory
-			.selectFrom(item)
-			.where(
-				cursorCondition(cursorId)
-				, item.seller.id.eq(sellerId))
-			.orderBy(item.id.desc())
-			.limit(pageable.getPageSize())
-			.fetch();
+		BooleanBuilder builder = generateBooleanBuilderWithCursorCondition(cursorId)
+			.and(item.seller.id.eq(sellerId));
+
+		return findAllBy(pageable, builder);
 	}
 
 	public List<Item> findAllBySellerIdAndStatusId(Pageable pageable, Long sellerId, Long statusId, Long cursorId) {
 
+		BooleanBuilder builder = generateBooleanBuilderWithCursorCondition(cursorId)
+			.and(item.seller.id.eq(sellerId))
+			.and(item.status.id.eq(statusId));
+
+		return findAllBy(pageable, builder);
+	}
+
+	private BooleanBuilder generateBooleanBuilderWithCursorCondition(Long cursorId) {
+
+		BooleanBuilder builder = new BooleanBuilder();
+		if (cursorId != null) {
+			builder.and(item.id.lt(cursorId));
+		}
+
+		return builder;
+	}
+
+	private List<Item> findAllBy(Pageable pageable, BooleanBuilder builder) {
+
 		return queryFactory
 			.selectFrom(item)
-			.where(
-				cursorCondition(cursorId)
-				, item.seller.id.eq(sellerId)
-				, item.status.id.eq(statusId))
+			.where(builder)
 			.orderBy(item.id.desc())
 			.limit(pageable.getPageSize())
 			.fetch();
-	}
-
-	private BooleanExpression cursorCondition(Long cursorId) {
-		return cursorId != null? item.id.lt(cursorId) : null;
 	}
 }
