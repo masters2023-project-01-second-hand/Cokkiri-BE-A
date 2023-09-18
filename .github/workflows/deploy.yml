@@ -48,7 +48,6 @@ jobs:
           echo "${{ secrets.APPLICATION_COMMON }}" > ${{ env.APPLICATION_COMMON_FILE_PATH }}
         shell: bash
 
-
       - name: Docker Build, tag, and push image to Amazon ECR
         id: build-image
         env:
