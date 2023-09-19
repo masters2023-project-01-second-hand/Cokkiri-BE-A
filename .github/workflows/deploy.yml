@@ -11,6 +11,7 @@ env:
   ECS_CLUSTER: cokkiri-cluster
   ECS_SERVICE: cokkiri-was
   CONTAINER_NAME: cokkiri-was
+  APPLICATION_COMMON_FILE_PATH: ./src/main/resources/application-common.yml
 
 jobs:
   was-build-and-deploy:
