@@ -6,7 +6,9 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
@@ -36,9 +38,9 @@ public class GeneralAuthController {
 	}
 
 	@PostMapping("/api/users")
-	public ResponseEntity<Void> signUp(
-		@RequestBody @Valid GeneralSignUpRequest signUpRequest) {
-
+	public ResponseEntity<Void> signUp(@RequestPart(required = false) MultipartFile profileImageFile,
+		@RequestPart("signupData") @Valid GeneralSignUpRequest signUpRequest) {
+		// TODO: 파일 업로드 처리하기
 		generalAuthService.signUp(signUpRequest);
 
 		return ResponseEntity.ok().build();
