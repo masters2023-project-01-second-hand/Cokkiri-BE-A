@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.item.entity.Item;
+import com.cokkiri.secondhand.item.entity.ItemStatus;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class ItemDetailResponse {
 	private Boolean isSeller;
 	private List<ItemImageResponse> images;
 	private String seller;
-	private ItemStatusListResponse status; // 3개 리스트 가져오기
+	private List<ItemStatusResponse> status; // 3개 리스트 가져오기
 	private String title;
 	private String categoryName;
 	private Date createdAt;
@@ -30,14 +31,16 @@ public class ItemDetailResponse {
 	private Boolean isFavorite;
 	private Long price;
 
-	public static ItemDetailResponse from(Item item, UserInfoForJwt userInfoForJwt, Boolean isFavorite) {
+	public static ItemDetailResponse from(Item item, UserInfoForJwt userInfoForJwt, List<ItemStatus> statuses, Boolean isFavorite) {
 		return new ItemDetailResponse(
 			isSeller(item, userInfoForJwt),
 			item.getItemImages().stream()
 				.map(ItemImageResponse::from)
 				.collect(Collectors.toList()),
 			item.getSeller().getNickname(),
-			null, // status list를 가져와야함
+			statuses.stream()
+				.map(st ->ItemStatusResponse.from(st, item))
+				.collect(Collectors.toList()),
 			item.getTitle(),
 			item.getCategory().getName(),
 			item.getCreateAt(),
