@@ -138,7 +138,7 @@ public class ItemService {
 
 		itemMetadataService.increaseHitCount(userInfo, item);
 
-		return ItemDetailResponse.from(item);
+		return ItemDetailResponse.from(item, userInfo);
 	}
 
 	@Transactional
