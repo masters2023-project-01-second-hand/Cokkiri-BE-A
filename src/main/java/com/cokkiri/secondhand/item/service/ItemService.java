@@ -8,20 +8,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.global.exception.list.NotFoundCategoryException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundItemException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundUserException;
 import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemFavoriteResponse;
-import com.cokkiri.secondhand.item.dto.response.ItemForSpecificUserListResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemForAnyOneListResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemForSpecificUserListResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemResponseForAnyOne;
 import com.cokkiri.secondhand.item.dto.response.ItemResponseForSpecificUser;
+import com.cokkiri.secondhand.item.entity.Category;
 import com.cokkiri.secondhand.item.entity.Favorite;
 import com.cokkiri.secondhand.item.entity.Item;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.entity.Status;
+import com.cokkiri.secondhand.item.repository.CategoryJpaRepository;
 import com.cokkiri.secondhand.item.repository.FavoriteJpaRepository;
 import com.cokkiri.secondhand.item.repository.ItemDslRepository;
 import com.cokkiri.secondhand.item.repository.ItemJpaRepository;
@@ -41,6 +44,7 @@ public class ItemService {
 	private final ItemJpaRepository itemJpaRepository;
 	private final ItemDslRepository itemDslRepository;
 	private final LocationJpaRepository locationJpaRepository;
+	private final CategoryJpaRepository categoryJpaRepository;
 	private final MyLocationJpaRepository myLocationJpaRepository;
 	private final FavoriteJpaRepository favoriteJpaRepository;
 
@@ -50,19 +54,28 @@ public class ItemService {
 	public ItemForAnyOneListResponse getItems(Long cursorId, Long categoryId, Pageable pageable, UserInfoForJwt userInfoForJwt) {
 
 		Location location = findLocation(userInfoForJwt);
+		Category category;
+		String categoryName;
 		List<ItemResponse> items;
 
 		if (categoryId == null) {
 			items = itemDslRepository.findAllByLocationId(pageable, location.getId(), cursorId).stream()
 				.map(item -> ItemResponseForAnyOne.from(item, userInfoForJwt))
 				.collect(Collectors.toList());
+
+			categoryName = null;
 		} else {
 			items = itemDslRepository.findAllByCategoryIdAndLocationId(pageable, categoryId, location.getId(), cursorId).stream()
 				.map(item -> ItemResponseForAnyOne.from(item, userInfoForJwt))
 				.collect(Collectors.toList());
+
+			category = categoryJpaRepository.findById(categoryId)
+				.orElseThrow(() -> new NotFoundCategoryException(categoryId));
+
+			categoryName = category.getName();
 		}
 
-		return new ItemForAnyOneListResponse(location.getDepth3(), items, calculateNextPage(items, pageable));
+		return new ItemForAnyOneListResponse(location.getDepth3(), categoryName, items, calculateNextPage(items, pageable));
 	}
 
 	@Transactional(readOnly = true)

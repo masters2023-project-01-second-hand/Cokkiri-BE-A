@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class ItemForAnyOneListResponse {
 
 	private String userLocation;
+	private String categoryName;
 	private List<ItemResponse> items;
 	private Long nextCursor;
 }
