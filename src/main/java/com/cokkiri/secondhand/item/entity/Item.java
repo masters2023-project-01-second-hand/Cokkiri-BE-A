@@ -67,7 +67,7 @@ public class Item {
 	private ItemContent itemContent;
 
 	@OneToMany
-	@JoinColumn (name = "item_id")
+	@JoinColumn(name = "item_id")
 	private List<ItemImage> itemImages = new ArrayList<ItemImage>();
 
 	public Long findSellerId() {

@@ -22,12 +22,14 @@ import com.cokkiri.secondhand.item.dto.response.ItemResponseForSpecificUser;
 import com.cokkiri.secondhand.item.entity.Category;
 import com.cokkiri.secondhand.item.entity.Favorite;
 import com.cokkiri.secondhand.item.entity.Item;
+import com.cokkiri.secondhand.item.entity.ItemStatus;
 import com.cokkiri.secondhand.item.entity.Location;
 import com.cokkiri.secondhand.item.entity.Status;
 import com.cokkiri.secondhand.item.repository.CategoryJpaRepository;
 import com.cokkiri.secondhand.item.repository.FavoriteJpaRepository;
 import com.cokkiri.secondhand.item.repository.ItemDslRepository;
 import com.cokkiri.secondhand.item.repository.ItemJpaRepository;
+import com.cokkiri.secondhand.item.repository.ItemStatusJpaRepository;
 import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.MyLocationList;
 import com.cokkiri.secondhand.user.entity.UserEntity;
@@ -47,6 +49,7 @@ public class ItemService {
 	private final CategoryJpaRepository categoryJpaRepository;
 	private final MyLocationJpaRepository myLocationJpaRepository;
 	private final FavoriteJpaRepository favoriteJpaRepository;
+	private final ItemStatusJpaRepository itemStatusJpaRepository;
 
 	private final ItemMetadataService itemMetadataService;
 
@@ -121,24 +124,23 @@ public class ItemService {
 		return items.get(items.size()-1).getId();
 	}
 
-	/*private Long calculateNextPageForUser(List<ItemResponseForSpecificUser> items, Pageable pageable) {
-		if (items.isEmpty()) return null;
-
-		if (items.size() < pageable.getPageSize()) return null;
-
-		return items.get(items.size()-1).getId();
-	}*/
-
 	@Transactional
 	public ItemDetailResponse getItemDetail(UserInfoForJwt userInfo, Long itemId) {
 
 		Item item = itemJpaRepository.findById(itemId).orElseThrow(
 			() -> new NotFoundItemException(itemId)
 		);
+		
+		UserEntity user = userEntityJpaRepository.findById(userInfo.getUserId())
+			.orElseThrow(() -> new NotFoundUserException(userInfo.getUserId()));
+
+		List<ItemStatus> statuses = itemStatusJpaRepository.findAll();
+
+		boolean isFavorite = existFavorite(userInfo, itemId);
 
 		itemMetadataService.increaseHitCount(userInfo, item);
 
-		return ItemDetailResponse.from(item);
+		return ItemDetailResponse.from(item, userInfo, statuses, isFavorite);
 	}
 
 	@Transactional
