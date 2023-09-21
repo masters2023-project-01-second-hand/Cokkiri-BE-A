@@ -20,6 +20,7 @@ import com.cokkiri.secondhand.item.repository.LocationJpaRepository;
 import com.cokkiri.secondhand.user.entity.GeneralUser;
 import com.cokkiri.secondhand.user.entity.MyLocation;
 import com.cokkiri.secondhand.user.entity.Role;
+import com.cokkiri.secondhand.user.entity.UserType;
 import com.cokkiri.secondhand.user.repository.GeneralUserJpaRepository;
 import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
 
@@ -69,6 +70,7 @@ public class GeneralAuthService {
 			.password(signUpRequest.getPassword())
 			.nickname(nickname)
 			.role(Role.USER)
+			.userType(UserType.GENERAL)
 			.profileImageUrl(imageUrl)
 			.build();
 		user.encodePassword(passwordEncoder);
