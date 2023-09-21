@@ -1,4 +1,4 @@
-INSERT INTO user(nickname, role, user_type) VALUES ("admin_nick", "USER", "GENERAL"), ("test-nick", "USER", "GENERAL");
+INSERT INTO user(nickname, role, user_type, profile_image_url) VALUES ("admin_nick", "USER", "GENERAL", "https://imgur.com/a/2ndgaq9"), ("test-nick", "USER", "GENERAL", "https://imgur.com/a/2ndgaq9");
 INSERT INTO general_user(user_id, username, password) VALUES (1, "admin", "$2a$10$MHM1urg21sP7yUQcgUNCfubE8Efb61jqINWyyoCzItIos/ZvLP2Uu"), (2, "test", "$2a$10$MHM1urg21sP7yUQcgUNCfubE8Efb61jqINWyyoCzItIos/ZvLP2Uu");
 
 ALTER TABLE location ADD FULLTEXT INDEX ft_index (depth_1, depth_2, depth_3) WITH PARSER ngram;
