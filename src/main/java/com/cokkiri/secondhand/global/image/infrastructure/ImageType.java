@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ImageType {
 
-	USER_PROFILE(ImageFileDirectory.USER_PROFILE),
-	ITEM(ImageFileDirectory.ITEM);
+	USER_PROFILE("images/user"),
+	ITEM("images/item");
 
 	private final String imageFileDirectory;
 }
