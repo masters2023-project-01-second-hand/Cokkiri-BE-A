@@ -40,9 +40,9 @@ public class ItemResponse {
 			item.getCreateAt(),
 			item.getStatus().getStatusName(),
 			item.getPrice(),
-			null, //CountDataResponse.from(item.getItemMetadata()),	// TODO: countData 추가하기
-			extractThumbnailUrl(item),			// TODO: image 추가하기
-			isSeller(item, userInfoForJwt));			// TODO: isSeller 추가하기
+			CountDataResponse.from(item.getItemMetadata()),	// TODO: countData 추가하기
+			extractThumbnailUrl(item),
+			isSeller(item, userInfoForJwt));
 	}
 
 	private static String extractThumbnailUrl(Item item) {
