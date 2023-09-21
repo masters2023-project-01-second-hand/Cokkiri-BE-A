@@ -121,21 +121,13 @@ public class ItemService {
 		return items.get(items.size()-1).getId();
 	}
 
-	/*private Long calculateNextPageForUser(List<ItemResponseForSpecificUser> items, Pageable pageable) {
-		if (items.isEmpty()) return null;
-
-		if (items.size() < pageable.getPageSize()) return null;
-
-		return items.get(items.size()-1).getId();
-	}*/
-
 	@Transactional
 	public ItemDetailResponse getItemDetail(UserInfoForJwt userInfo, Long itemId) {
 
 		Item item = itemJpaRepository.findById(itemId).orElseThrow(
 			() -> new NotFoundItemException(itemId)
 		);
-
+		
 		UserEntity user = userEntityJpaRepository.findById(userInfo.getUserId())
 			.orElseThrow(() -> new NotFoundUserException(userInfo.getUserId()));
 
