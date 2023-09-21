@@ -1,6 +1,6 @@
 spring:
   profiles:
     group:
-      local: local, common
-      local-docker: local-docker, common
+      local: local, common, cloud
+      local-docker: local-docker, common, cloud
     active: local-docker
