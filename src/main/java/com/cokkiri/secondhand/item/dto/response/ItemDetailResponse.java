@@ -27,10 +27,10 @@ public class ItemDetailResponse {
 	private Date createdAt;
 	private String content;
 	private CountDataResponse countData;
-	// isFavorite
+	private Boolean isFavorite;
 	private Long price;
 
-	public static ItemDetailResponse from(Item item, UserInfoForJwt userInfoForJwt) {
+	public static ItemDetailResponse from(Item item, UserInfoForJwt userInfoForJwt, Boolean isFavorite) {
 		return new ItemDetailResponse(
 			isSeller(item, userInfoForJwt),
 			item.getItemImages().stream()
@@ -43,6 +43,7 @@ public class ItemDetailResponse {
 			item.getCreateAt(),
 			item.getItemContent().getContent(),
 			CountDataResponse.from(item.getItemMetadata()),
+			isFavorite,
 			item.getPrice()
 		);
 	}

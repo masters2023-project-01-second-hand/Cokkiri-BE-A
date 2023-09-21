@@ -136,9 +136,14 @@ public class ItemService {
 			() -> new NotFoundItemException(itemId)
 		);
 
+		UserEntity user = userEntityJpaRepository.findById(userInfo.getUserId())
+			.orElseThrow(() -> new NotFoundUserException(userInfo.getUserId()));
+
+		boolean isFavorite = existFavorite(userInfo, itemId);
+
 		itemMetadataService.increaseHitCount(userInfo, item);
 
-		return ItemDetailResponse.from(item, userInfo);
+		return ItemDetailResponse.from(item, userInfo, isFavorite);
 	}
 
 	@Transactional
