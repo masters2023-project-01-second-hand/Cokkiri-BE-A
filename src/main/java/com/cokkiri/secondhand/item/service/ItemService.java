@@ -152,6 +152,7 @@ public class ItemService {
 
 		if (existFavorite(userInfo, itemId)) {
 			favoriteJpaRepository.deleteByUserIdAndItemId(userInfo.getUserId(), itemId);
+
 			itemMetadataService.decreaseFavoriteCount(item);
 
 			return ItemFavoriteResponse.from(false);
@@ -163,6 +164,7 @@ public class ItemService {
 		Favorite favorite = Favorite.builder().user(user).item(item).build();
 
 		favoriteJpaRepository.save(favorite);
+
 		itemMetadataService.increaseFavoriteCount(item);
 
 		return ItemFavoriteResponse.from(true);

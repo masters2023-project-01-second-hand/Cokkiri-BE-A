@@ -7,6 +7,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class ItemMetadata {
 	private Long hit;
 	private Long chat;
 	private Long favorite;
+
+	@Version
+	private Long version;
 
 	public ItemMetadata(Item item) {
 		this.item = item;
