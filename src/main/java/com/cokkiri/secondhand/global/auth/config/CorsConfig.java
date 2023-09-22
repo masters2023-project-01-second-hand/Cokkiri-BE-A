@@ -15,7 +15,7 @@ public class CorsConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://3.39.123.8:8080", "http://cokkirimarket.link"));
+		configuration.setAllowedOrigins(List.of("www.cokkirimarket.link"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setExposedHeaders(List.of("*"));
