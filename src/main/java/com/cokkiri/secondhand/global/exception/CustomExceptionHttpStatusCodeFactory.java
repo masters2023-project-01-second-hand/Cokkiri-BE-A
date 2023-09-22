@@ -29,6 +29,8 @@ public class CustomExceptionHttpStatusCodeFactory {
 				return HttpStatus.CONFLICT;		// 409
 			case FILE_UPLOAD_FAILURE_EXCEPTION:
 				return HttpStatus.INTERNAL_SERVER_ERROR; // 500
+			case FAVORITE_COUNT_FAILURE_EXCEPTION:
+				return HttpStatus.SERVICE_UNAVAILABLE; // 503
 			case ILLEGAL_STATUS_EXCEPTION:
 			case MY_LOCATION_DELETION_NOT_ALLOWED_EXCEPTION:
 			case ILLEGAL_FILE_STATE_EXCEPTION:
