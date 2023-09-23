@@ -41,7 +41,7 @@ public class SecurityConfig {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests()
-			.anyRequest().permitAll()
+			.antMatchers("/**").permitAll() // Allow all requests
 			.and()
 			.oauth2Login()
 			.successHandler(oAuthLoginSuccessHandler)
@@ -49,11 +49,10 @@ public class SecurityConfig {
 			.userInfoEndpoint()
 			.userService(oAuthService);
 
-		http.addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class);
+		// http.addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class); // Optionally, you can comment out this line if you don't want to use the JWT filter at all.
 
 		return http.build();
 	}
-
 
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
