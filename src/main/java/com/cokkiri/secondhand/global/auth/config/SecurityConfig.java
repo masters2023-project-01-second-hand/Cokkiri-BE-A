@@ -50,7 +50,7 @@ public class SecurityConfig {
 				"/api/reissue-access-token",
 				"/api/locations",
 				"/api/categories",
-				"health_was").permitAll() // White URI List
+				"/health_was").permitAll() // White URI List
 			.antMatchers(
 				"/api/items").permitAll() // Public URI List
 			.anyRequest().authenticated()
