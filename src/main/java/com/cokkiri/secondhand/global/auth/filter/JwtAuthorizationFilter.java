@@ -49,39 +49,41 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 		//HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 
-		if (request.getMethod().equals("OPTIONS")) {
-			return;
-		}
+		// if (request.getMethod().equals("OPTIONS")) {
+		// 	return;
+		// }
+		//
+		// if (whiteListCheck(request.getRequestURI())) {
+		// 	filterChain.doFilter(request, response);
+		// 	return;
+		// }
+		//
+		// if (!jwtAuthHttpResponseManager.isContainAccessToken(request)) {
+		//
+		// 	if (publicListCheck(request.getRequestURI())) {
+		// 		UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateGuestUserInfo();
+		// 		request.setAttribute("userInfoForJwt", userInfoForJwt);
+		// 		filterChain.doFilter(request, response);
+		// 		return;
+		// 	}
+		//
+		// 	jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
+		// 	return;
+		// }
+		//
+		// try {
+		// 	String token = jwtAuthHttpResponseManager.getAccessToken(request);
+		// 	UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserInfoForJwtBy(token);
+		// 	SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
+		//
+		// 	request.setAttribute("userInfoForJwt", userInfoForJwt);
+		//
+		// 	filterChain.doFilter(request, response);
+		// } catch (Exception e) {
+		// 	jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
+		// }
 
-		if (whiteListCheck(request.getRequestURI())) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-
-		if (!jwtAuthHttpResponseManager.isContainAccessToken(request)) {
-
-			if (publicListCheck(request.getRequestURI())) {
-				UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateGuestUserInfo();
-				request.setAttribute("userInfoForJwt", userInfoForJwt);
-				filterChain.doFilter(request, response);
-				return;
-			}
-
-			jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
-			return;
-		}
-
-		try {
-			String token = jwtAuthHttpResponseManager.getAccessToken(request);
-			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserInfoForJwtBy(token);
-			SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
-
-			request.setAttribute("userInfoForJwt", userInfoForJwt);
-
-			filterChain.doFilter(request, response);
-		} catch (Exception e) {
-			jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
-		}
+		filterChain.doFilter(request, response);
 	}
 
 	private boolean whiteListCheck(String uri) {
