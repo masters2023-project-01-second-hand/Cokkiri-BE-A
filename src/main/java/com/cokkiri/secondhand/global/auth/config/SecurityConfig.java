@@ -36,26 +36,13 @@ public class SecurityConfig {
 			.csrf().disable()
 			.headers().frameOptions().disable()
 			.and()
-
 			.cors()
 			.and()
-
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
-
 			.authorizeRequests()
-			.antMatchers(
-				"/api/users",
-				"/api/login",
-				"/api/reissue-access-token",
-				"/api/locations",
-				"/api/categories",
-				"/health_was").permitAll() // White URI List
-			.antMatchers(
-				"/api/items").permitAll() // Public URI List
-			.anyRequest().authenticated()
+			.anyRequest().permitAll()
 			.and()
-
 			.oauth2Login()
 			.successHandler(oAuthLoginSuccessHandler)
 			.failureHandler(oAuthLoginFailureHandler)
@@ -66,6 +53,7 @@ public class SecurityConfig {
 
 		return http.build();
 	}
+
 
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
