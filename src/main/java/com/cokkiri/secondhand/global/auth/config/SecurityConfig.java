@@ -48,7 +48,8 @@ public class SecurityConfig {
 				"/api/users",
 				"/api/login",
 				"/api/reissue-access-token",
-				"/api/locations").permitAll() // White URI List
+				"/api/locations",
+				"/api/categories").permitAll() // White URI List
 			.antMatchers(
 				"/api/items").permitAll() // Public URI List
 			.anyRequest().authenticated()

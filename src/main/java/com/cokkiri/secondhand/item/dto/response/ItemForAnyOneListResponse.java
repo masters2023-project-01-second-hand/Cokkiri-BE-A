@@ -10,7 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class ItemStatusListResponse {
+public class ItemForAnyOneListResponse {
 
-	private List<ItemStatusResponse> status;
+	private String userLocation;
+	private String categoryName;
+	private List<ItemResponse> items;
+	private Long nextCursor;
 }

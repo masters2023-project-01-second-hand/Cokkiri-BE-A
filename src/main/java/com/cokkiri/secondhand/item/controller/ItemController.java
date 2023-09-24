@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemFavoriteResponse;
-import com.cokkiri.secondhand.item.dto.response.ItemListForUserResponse;
-import com.cokkiri.secondhand.item.dto.response.ItemListResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemForSpecificUserListResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemForAnyOneListResponse;
 import com.cokkiri.secondhand.item.service.ItemService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class ItemController {
 	private final ItemService itemService;
 
 	@GetMapping("/api/items")
-	public ResponseEntity<ItemListResponse> showItems(
+	public ResponseEntity<ItemForAnyOneListResponse> showItems(
 		HttpServletRequest request,
 		@RequestParam(name = "cursor", required = false) Long cursorId,
 		@RequestParam(required = false) Long categoryId) {
@@ -38,7 +38,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/api/users/{nickname}/items")
-	public ResponseEntity<ItemListForUserResponse> showItemsForSpecificUser(
+	public ResponseEntity<ItemForSpecificUserListResponse> showItemsForSpecificUser(
 		@PathVariable String nickname,
 		@RequestParam(required = false) Boolean isSold,
 		@RequestParam(name = "cursor", required = false) Long cursorId) {

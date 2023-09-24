@@ -1,10 +1,11 @@
 package com.cokkiri.secondhand.item.dto.response;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
+import java.util.List;
 
-import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.item.entity.Item;
+import com.cokkiri.secondhand.item.entity.ItemImage;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,34 +13,38 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ItemResponse {
+
+	// 아이템 이미지 리스트의 첫 번째 이미지를 섬네일 이미지로 선정한다.
+	private static final int THUMBNAIL_IMAGE_INDEX = 0;
 
 	private Long id;
 	private String title;
 	private String locationName;
-	private Date createAt;
-	private String status;
+	private Date createdAt;
+	private String statusName;
 	private Long price;
 	private CountDataResponse countData;
 	private String thumbnailUrl;
-	private boolean isSeller;
 
-	public static ItemResponse from(Item item, UserInfoForJwt userInfoForJwt) {
-		return new ItemResponse(
-			item.getId(),
-			item.getTitle(),
-			item.getLocation().getFullName(),
-			item.getCreateAt(),
-			item.getStatus().getStatusName(),
-			item.getPrice(),
-			null, //CountDataResponse.from(item.getItemMetadata()),	// TODO: countData 추가하기
-			null,			// TODO: image 추가하기
-			isSeller(item, userInfoForJwt));			// TODO: isSeller 추가하기
+	public ItemResponse(Item item) {
+		this.id = item.getId();
+		this.title = item.getTitle();
+		this.locationName = item.getLocation().getFullName();
+		this.createdAt = item.getCreateAt();
+		this.statusName = item.getStatus().getStatusName();
+		this.price = item.getPrice();
+		this.countData = CountDataResponse.from(item.getItemMetadata());
+		this.thumbnailUrl = extractThumbnailUrl(item);
 	}
 
-	private static boolean isSeller(Item item, UserInfoForJwt userInfoForJwt) {
-		return Objects.equals(item.findSellerId(), userInfoForJwt.getUserId());
+	private static String extractThumbnailUrl(Item item) {
+		List<ItemImage> itemImage =new ArrayList<>();
+		if(item.getItemImages().isEmpty()) {
+			return null;
+		}
+		return item.getItemImages().get(THUMBNAIL_IMAGE_INDEX).getUrl();
 	}
 }

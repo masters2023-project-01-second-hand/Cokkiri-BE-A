@@ -1,9 +1,3 @@
-buildscript {
-    ext {
-        jjwtVersion = "0.11.5"
-    }
-}
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.14'
@@ -40,13 +34,13 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     // jwt
-    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // QueryDSL
-    implementation 'com.querydsl:querydsl-jpa'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+    implementation 'com.querydsl:querydsl-jpa:5.0.0'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jpa'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
@@ -60,5 +54,5 @@ tasks.named('test') {
 
 // QueryDSL
 clean {
-    delete file('scr/main/generated')
+    delete file('src/main/generated')
 }

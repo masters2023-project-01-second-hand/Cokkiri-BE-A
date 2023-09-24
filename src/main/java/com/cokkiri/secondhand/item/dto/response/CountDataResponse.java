@@ -17,8 +17,8 @@ public class CountDataResponse {
 
 	public static CountDataResponse from(ItemMetadata itemMetadata) {
 		return new CountDataResponse(
-			itemMetadata.getChat(),
-			itemMetadata.getFavorite()
+			itemMetadata == null? 0 : itemMetadata.getChat(),
+			itemMetadata == null? 0 : itemMetadata.getFavorite()
 		);
 	}
 }
