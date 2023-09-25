@@ -11,6 +11,7 @@ jobs:
   build-spring-boot-image:
     runs-on: ubuntu-latest
     steps:
+      -
       ## jdk setting
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -18,6 +19,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin' # https://github.com/actions/setup-java
+
       # gradle caching - 빌드 시간 향상
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -52,28 +54,23 @@ jobs:
       - name: Docker build & push to dev
         run: |
           docker login -u ${{ secrets.APE_DOCKER_USERNAME }} -p ${{ secrets.APE_DOCKER_PASSWORD }}
-          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-hub .
-          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-hub
+          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app .
+          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app
 
-  cd-pipeline:
-    needs:
-      - build-spring-boot-image
-    name: continues deploy
+  SSH-Transfer:
+    needs: [build-spring-boot-image]
     runs-on: ubuntu-latest
-
     steps:
 
-      # docker-compose 실행
-      - name: Deploy to dev
+      - name: SSH Transfer
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.APE_EC2_HOST }} # EC2 인스턴스 퍼블릭 DNS
+          host: ${{ secrets.APE_EC2_HOST }}
           username: ${{ secrets.APE_EC2_USERNAME }}
-          key: ${{ secrets.APE_EC2_PRIVATE_KEY }} # pem 키
-          port: 22
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
           script: |
-            sudo chmod 666 /var/run/docker.sock
-            docker-compose -f docker-compose.yml down -v
-            docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d
-            docker image prune -f
+            sudo docker-compose down -v
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app:latest
+            sudo docker-compose up -d
+            sudo docker image prune -a -f
