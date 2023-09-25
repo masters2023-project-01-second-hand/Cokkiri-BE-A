@@ -1,83 +1,64 @@
-name: issue
+name: second-hand-be auto-deploy
 
 on:
   push:
-    branches:
-      - release-ape-be-test
+    branches: [ "release-ape-be-test" ]
 
 permissions:
   contents: read
 
-env:
-  DEPLOYMENT_APPLICATION_NAME: second-hand
-  DEPLOYMENT_GROUP_NAME: second-hand-deploy-group
-  AWS_REGION: ap-northeast-2
-
 jobs:
-  build-spring-boot-image:
+
+  was-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
 
     steps:
-      - uses: actions/checkout@v3
-      # JDK 설정
+
+      # 1. Source 단계
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
-      # gradle caching - 빌드 시간 향상
-      - name: Gradle Caching
-        uses: actions/cache@v3
-        with:
-          # 캐시할 디렉토리 경로를 지정합니다.
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          # 캐시를 구분하는 키를 지정합니다.
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          # 이전에 생성된 캐시를 복원하는데 사용할 키를 지정합니다.
-          # 캐시가 없거나 만료되었을때 이 키를 기반으로 이전에 생성된 캐시를 찾아 복원합니다.
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
-      # 환경별 yml 파일 생성(1) - application-prod.yml
+      # 환경별 yml 파일 생성(1) - application-release.yml
       - name: make application-release.yml
         run: |
           touch ./src/main/resources/application-release.yml
           echo "${{ secrets.APE_APPLICATION_YML }}" > ./application-release.yml
         shell: bash
 
-      # gradlew 실행을 위해서 실행 권한을 부여
-      - name: Grant execute permission for gradlew
+      # 2. build 단계
+      - name: Grant Execute Permission For Gradlew
         run: chmod +x ./gradlew
 
-      # Gradle을 이용하여 빌드 수행
-      - name: Build with Gradle
-        run: ./gradlew build -x test
+      - name: Build With Gradle
+        run: ./gradlew clean build -x test
 
+      # 3. docker hub로 build & push
+      - name: Docker Build And Push
+        run: |
+          docker login -u ${{ secrets.APE_DOCKER_USERNAME }} -p ${{ secrets.APE_DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest .
+          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest
 
-      - name: Create Zip File
-        run: zip -r ./second_hand_$GITHUB_SHA.zip .
-        shell: bash
+  SSH-Transfer:
+    needs: [was-deploy]
+    runs-on: ubuntu-latest
+    steps:
 
-      - name: Configure aws
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: SSH Transfer
+        uses: appleboy/ssh-action@master
         with:
-          aws-access-key-id: ${{ secrets.APE_IAM_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.APE_IAM_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Send zip file s3
-        run: aws s3 cp --region ${{ env.AWS_REGION }} ./second_hand_$GITHUB_SHA.zip s3://${{ secrets.APE_S3_BUCKET_NAME }}/second_hand_$GITHUB_SHA.zip
-        shell: bash
-
-      - name: Deploy CodeDeploy
-        run: aws deploy create-deployment
-          --application-name ${{ env.DEPLOYMENT_APPLICATION_NAME }}
-          --deployment-config-name CodeDeployDefault.AllAtOnce
-          --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }}
-          --s3-location bucket=${{ secrets.APE_S3_BUCKET_NAME }},bundleType=zip,key=./second_hand_$GITHUB_SHA.zip
-        shell: bash
+          host: ${{ secrets.APE_EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
+          script: |
+            sudo docker-compose down -v
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest
+            sudo docker-compose up -d
+            sudo docker image prune -a -f
