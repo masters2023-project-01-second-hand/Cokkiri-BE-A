@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class LocationSearchService {
 
 	private static final String DEFAULT_KEYWORD = "서울 역삼";
-	private static final String SINGLE_LETTER_REGEX = "[ㄱ-ㅎㅏ-ㅣ]";때
+	private static final String SINGLE_LETTER_REGEX = "[ㄱ-ㅎㅏ-ㅣ]";
 	private static final String EMPTY_STRING = "";
 
 	private final Pattern pattern = Pattern.compile(SINGLE_LETTER_REGEX);
