@@ -1,7 +1,7 @@
 name: second-hand auto-deploy
 
 on:
-  pull_request:
+  push:
     branches: [ "fe" ]
 
 permissions:
