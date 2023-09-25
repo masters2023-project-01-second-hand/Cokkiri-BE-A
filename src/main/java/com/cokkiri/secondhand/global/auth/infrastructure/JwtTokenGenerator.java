@@ -1,8 +1,8 @@
 package com.cokkiri.secondhand.global.auth.infrastructure;
 
 import java.security.Key;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,6 +28,8 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenGenerator  {
 
+	private static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("UTC");
+
 	private final String secret;
 	private final Long accessTokenExpirationTime;
 	private final Long refreshTokenExpirationTime;
@@ -38,8 +40,8 @@ public class JwtTokenGenerator  {
 	public JwtTokenGenerator(
 		MemoryJwtRepository memoryJwtRepository,
 		@Value("${jwt.secret}") String secret,
-		@Value("${jwt.access.expiration-time-in-milli-seconds}") Long accessTokenExpirationTime,
-		@Value("${jwt.refresh.expiration-time-in-milli-seconds}") Long refreshTokenExpirationTime,
+		@Value("${jwt.access.expiration-time-in-seconds}") Long accessTokenExpirationTime,
+		@Value("${jwt.refresh.expiration-time-in-seconds}") Long refreshTokenExpirationTime,
 		@Value("${jwt.access.subject}") String accessSubject,
 		@Value("${jwt.access.subject}") String refreshSubject) {
 
@@ -96,42 +98,39 @@ public class JwtTokenGenerator  {
 	}
 
 	private JwtAccessToken createAccessToken(UserInfoForJwt user) {
-		Date expirationDate = getAccessExpirationDate();
+		ZonedDateTime expirationDateTime = getAccessExpirationDateTime();
 		return JwtAccessToken.from(
-			createToken(accessSubject, user.generateClaims(), expirationDate),
-			convertToDateTime(expirationDate)
+			createToken(accessSubject, user.generateClaims(), expirationDateTime),
+			expirationDateTime
 		);
 	}
 
 	private JwtRefreshToken createRefreshToken() {
-		Date expirationDate = getRefreshExpirationDate();
+		ZonedDateTime expirationDateTime = getRefreshExpirationDateTime();
 		return JwtRefreshToken.from(
-			createToken(refreshSubject, Map.of(), expirationDate),
-			convertToDateTime(expirationDate)
+			createToken(refreshSubject, Map.of(), expirationDateTime),
+			expirationDateTime
 		);
 	}
 
-	private String createToken(String subject, Map<String, String> claims, Date expirationDate) {
+	private String createToken(String subject, Map<String, String> claims, ZonedDateTime expirationDateTime) {
 		return Jwts.builder()
 			.setSubject(subject)
 			.setClaims(claims)
 			.setIssuedAt(new Date())
-			.setExpiration(expirationDate)
+			.setExpiration(Date.from(expirationDateTime.toInstant()))
 			.signWith(secretKey, SignatureAlgorithm.HS256)
 			.compact();
 	}
 
-	private Date getAccessExpirationDate() {
-		return new Date(System.currentTimeMillis() + accessTokenExpirationTime);
+	private ZonedDateTime getAccessExpirationDateTime() {
+		return ZonedDateTime.now(DEFAULT_TIME_ZONE)
+			.plusSeconds(accessTokenExpirationTime);
 	}
 
-	private Date getRefreshExpirationDate() {
-		return new Date(System.currentTimeMillis() + refreshTokenExpirationTime);
+	private ZonedDateTime getRefreshExpirationDateTime() {
+		return ZonedDateTime.now(DEFAULT_TIME_ZONE)
+			.plusSeconds(refreshTokenExpirationTime);
 	}
 
-	private LocalDateTime convertToDateTime(Date date) {
-		return date.toInstant() // Date -> Instant
-			.atZone(ZoneId.systemDefault()) // Instant -> ZonedDateTime
-			.toLocalDateTime();
-	}
 }

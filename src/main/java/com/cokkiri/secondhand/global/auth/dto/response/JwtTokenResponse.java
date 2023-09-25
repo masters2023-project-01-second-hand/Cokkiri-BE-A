@@ -1,6 +1,6 @@
 package com.cokkiri.secondhand.global.auth.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
 
@@ -12,9 +12,9 @@ import lombok.Getter;
 public class JwtTokenResponse {
 
 	private String accessToken;
-	private LocalDateTime expirationAccessTokenDateTime;
+	private ZonedDateTime expirationAccessTokenDateTime;
 	private String refreshToken;
-	private LocalDateTime expirationRefreshTokenDateTime;
+	private ZonedDateTime expirationRefreshTokenDateTime;
 
 	public JwtRefreshToken toRefreshToken() {
 		return JwtRefreshToken.from(

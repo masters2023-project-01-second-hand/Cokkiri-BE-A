@@ -1,6 +1,6 @@
 package com.cokkiri.secondhand.global.auth.entity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,9 +11,9 @@ import lombok.Getter;
 public class JwtAccessToken {
 
 	private String accessToken;
-	private LocalDateTime expirationDateTime;
+	private ZonedDateTime expirationDateTime;
 
-	public static JwtAccessToken from(String accessToken, LocalDateTime expirationDateTime) {
+	public static JwtAccessToken from(String accessToken, ZonedDateTime expirationDateTime) {
 		return new JwtAccessToken(
 			accessToken,
 			expirationDateTime
