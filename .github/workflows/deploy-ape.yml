@@ -1,0 +1,101 @@
+# github repository Actions 페이지에 나타낼 이름
+name: Cokkiri Market BE-A CI/CD
+
+# event trigger
+on:
+  push:
+    branches:
+      - release-ape-be-test
+
+jobs:
+  build-spring-boot-image:
+    runs-on: ubuntu-latest
+    steps:
+      ## jdk setting
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin' # https://github.com/actions/setup-java
+      # gradle caching - 빌드 시간 향상
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          # 캐시할 디렉토리 경로를 지정합니다.
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          # 캐시를 구분하는 키를 지정합니다.
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          # 이전에 생성된 캐시를 복원하는데 사용할 키를 지정합니다.
+          # 캐시가 없거나 만료되었을때 이 키를 기반으로 이전에 생성된 캐시를 찾아 복원합니다.
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # yml 파일 생성 - application-prod.yml
+      - name: make application-release.yml
+        run: |
+          touch ./src/main/resources/application-release.yml
+          echo "${{ secrets.APE_APPLICATION_YML }}" > ./application-release.yml
+        shell: bash
+
+      # gradlew 실행을 위해서 실행 권한을 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # Gradle을 이용하여 빌드 수행
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      # docker build & push to develop
+      - name: Docker build & push to dev
+        run: |
+          docker login -u ${{ secrets.APE_DOCKER_USERNAME }} -p ${{ secrets.APE_DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-hub .
+          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-hub
+
+  cd-pipeline:
+    needs:
+      - build-spring-boot-image
+    name: continues deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      # nginx.conf 파일을 EC2에 업로드
+      - name: copy nginx.conf file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.APE_EC2_HOST }}
+          username: ${{ secrets.APE_EC2_USERNAME }}
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
+          port: 22
+          source: "./nginx/nginx.conf"
+          target: "/home/${{ secrets.APE_EC2_USERNAME }}/"
+
+      # docker-compose.yml 파일을 EC2에 업로드
+      - name: copy docker-compose file via ssh password
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.APE_EC2_HOST }}
+          username: ${{ secrets.APE_EC2_USERNAME }}
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
+          port: 22
+          source: "docker-compose.yml"
+          target: "/home/${{ secrets.APE_EC2_USERNAME }}/"
+
+      # docker-compose 실행
+      - name: Deploy to dev
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.APE_EC2_HOST }} # EC2 인스턴스 퍼블릭 DNS
+          username: ${{ secrets.APE_EC2_USERNAME }}
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }} # pem 키
+          port: 22
+          script: |
+            sudo chmod 666 /var/run/docker.sock
+            docker-compose -f docker-compose.yml down -v
+            docker-compose -f docker-compose.yml pull
+            docker-compose -f docker-compose.yml up -d
+            docker image prune -f
