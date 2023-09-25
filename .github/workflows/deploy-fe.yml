@@ -37,6 +37,7 @@ jobs:
           docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-web-with-nginx:latest
 
   SSH-Transfer:
+    needs: fe-deploy
     runs-on: ubuntu-latest
     steps:
 
