@@ -49,7 +49,9 @@ public class JwtAuthHttpResponseManager {
 
 	public boolean isContainAccessToken(HttpServletRequest request) {
 		String authorization = request.getHeader(accessHttpHeader);
-		return authorization != null && authorization.startsWith(authorizationType);
+		// 현재 프론트에서 토큰을 보내줄 때 Bearer를 생략하고 보내주고 있기 때문에 임시로 변경 하였음
+		//return authorization != null && authorization.startsWith(authorizationType);
+		return authorization != null;
 	}
 
 	public String getAccessToken(HttpServletRequest request) {
