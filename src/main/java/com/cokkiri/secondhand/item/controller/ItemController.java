@@ -59,7 +59,7 @@ public class ItemController {
 		);
 	}
 
-	@PatchMapping("/api/items/{itemId}/favorite")
+	@PatchMapping("/api/items/{itemId}/favorites")
 	public ResponseEntity<ItemFavoriteResponse> addFavorite(
 		HttpServletRequest request, @PathVariable Long itemId) {
 
