@@ -1,0 +1,78 @@
+name: second-hand-be auto-deploy
+
+on:
+  push:
+    branches: [ "ape-be-release-test" ]
+
+permissions:
+  contents: read
+
+jobs:
+
+  was-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Source 단계
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      # 환경별 yml 파일 생성(1)
+      - name: make application-cloud.yml
+        run: |
+          touch ./src/main/resources/application-cloud.yml
+          echo "${{ secrets.APE_APPLICATION_CLOUD_YML }}" > ./application-cloud.yml
+        shell: bash
+
+      # 환경별 yml 파일 생성(2)
+      - name: make application-release.yml
+        run: |
+          touch ./src/main/resources/application-release.yml
+          echo "${{ secrets.APE_APPLICATION_RELEASE_YML }}" > ./application-release.yml
+        shell: bash
+
+      # 환경별 yml 파일 생성(3)
+      - name: make application-common.yml
+        run: |
+          touch ./src/main/resources/application-common.yml
+          echo "${{ secrets.APE_APPLICATION_COMMON_YML }}" > ./application-common.yml
+        shell: bash
+
+      # 2. build 단계
+      - name: Grant Execute Permission For Gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build With Gradle
+        run: ./gradlew clean build -x test
+
+      # 3. docker hub로 build & push
+      - name: Docker Build And Push
+        run: |
+          docker login -u ${{ secrets.APE_DOCKER_USERNAME }} -p ${{ secrets.APE_DOCKER_PASSWORD }}
+          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest .
+          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest
+
+  SSH-Transfer:
+    needs: [was-deploy]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: SSH Transfer
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.APE_EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
+          script: |
+            sudo docker-compose down -v
+            sudo docker rm -f $(docker ps -qa)
+            sudo docker pull ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-was:latest
+            sudo docker-compose up -d
+            sudo docker image prune -a -f

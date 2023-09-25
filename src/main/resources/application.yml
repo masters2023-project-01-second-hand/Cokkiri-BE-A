@@ -3,4 +3,5 @@ spring:
     group:
       local: local, common, cloud
       local-docker: local-docker, common, cloud
-    active: local-docker
+      release: release, common, cloud
+    active: release
