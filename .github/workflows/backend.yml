@@ -1,25 +1,33 @@
-# github repository Actions 페이지에 나타낼 이름
-name: Cokkiri Market BE-A CI/CD
+name: issue
 
-# event trigger
 on:
   push:
     branches:
       - release-ape-be-test
 
+permissions:
+  contents: read
+
+env:
+  DEPLOYMENT_APPLICATION_NAME: second-hand
+  DEPLOYMENT_GROUP_NAME: second-hand-deploy-group
+  AWS_REGION: ap-northeast-2
+
 jobs:
   build-spring-boot-image:
     runs-on: ubuntu-latest
-    steps:
+    defaults:
+      run:
+        shell: bash
 
-      ## jdk setting
+    steps:
       - uses: actions/checkout@v3
+      # JDK 설정
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'temurin' # https://github.com/actions/setup-java
-
+          distribution: 'temurin'
       # gradle caching - 빌드 시간 향상
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -35,7 +43,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # yml 파일 생성 - application-prod.yml
+      # 환경별 yml 파일 생성(1) - application-prod.yml
       - name: make application-release.yml
         run: |
           touch ./src/main/resources/application-release.yml
@@ -50,27 +58,26 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      # docker build & push to develop
-      - name: Docker build & push to dev
-        run: |
-          docker login -u ${{ secrets.APE_DOCKER_USERNAME }} -p ${{ secrets.APE_DOCKER_PASSWORD }}
-          docker build -f Dockerfile -t ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app .
-          docker push ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app
 
-  SSH-Transfer:
-    needs: [build-spring-boot-image]
-    runs-on: ubuntu-latest
-    steps:
+      - name: Create Zip File
+        run: zip -r ./second_hand_$GITHUB_SHA.zip .
+        shell: bash
 
-      - name: SSH Transfer
-        uses: appleboy/ssh-action@master
+      - name: Configure aws
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          host: ${{ secrets.APE_EC2_HOST }}
-          username: ${{ secrets.APE_EC2_USERNAME }}
-          key: ${{ secrets.APE_EC2_PRIVATE_KEY }}
-          script: |
-            sudo docker-compose down -v
-            sudo docker rm -f $(docker ps -qa)
-            sudo docker pull ${{ secrets.APE_DOCKER_USERNAME }}/second-hand-spring-boot-app:latest
-            sudo docker-compose up -d
-            sudo docker image prune -a -f
+          aws-access-key-id: ${{ secrets.APE_IAM_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.APE_IAM_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Send zip file s3
+        run: aws s3 cp --region ${{ env.AWS_REGION }} ./second_hand_$GITHUB_SHA.zip s3://${{ secrets.APE_S3_BUCKET_NAME }}/second_hand_$GITHUB_SHA.zip
+        shell: bash
+
+      - name: Deploy CodeDeploy
+        run: aws deploy create-deployment
+          --application-name ${{ env.DEPLOYMENT_APPLICATION_NAME }}
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }}
+          --s3-location bucket=${{ secrets.APE_S3_BUCKET_NAME }},bundleType=zip,key=./second_hand_$GITHUB_SHA.zip
+        shell: bash
