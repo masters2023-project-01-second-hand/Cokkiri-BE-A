@@ -14,11 +14,13 @@ public class CountDataResponse {
 
 	private Long chat;
 	private Long favorite;
+	private Long view;
 
 	public static CountDataResponse from(ItemMetadata itemMetadata) {
 		return new CountDataResponse(
 			itemMetadata == null? 0 : itemMetadata.getChat(),
-			itemMetadata == null? 0 : itemMetadata.getFavorite()
+			itemMetadata == null? 0 : itemMetadata.getFavorite(),
+			itemMetadata == null? 0 : itemMetadata.getHit()
 		);
 	}
 }
