@@ -70,20 +70,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		// 	jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
 		// 	return;
 		// }
-		//
-		// try {
-		// 	String token = jwtAuthHttpResponseManager.getAccessToken(request);
-		// 	UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserInfoForJwtBy(token);
-		// 	SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
-		//
-		// 	request.setAttribute("userInfoForJwt", userInfoForJwt);
-		//
-		// 	filterChain.doFilter(request, response);
-		// } catch (Exception e) {
-		// 	jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
-		// }
 
-		filterChain.doFilter(request, response);
+		try {
+			String token = jwtAuthHttpResponseManager.getAccessToken(request);
+			UserInfoForJwt userInfoForJwt = jwtTokenGenerator.getUserInfoForJwtBy(token);
+			SecurityContextHolder.getContext().setAuthentication(getAuthentication(userInfoForJwt));
+
+			request.setAttribute("userInfoForJwt", userInfoForJwt);
+
+			filterChain.doFilter(request, response);
+		} catch (Exception e) {
+			jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
+		}
+
+		// filterChain.doFilter(request, response);
 	}
 
 	private boolean whiteListCheck(String uri) {
