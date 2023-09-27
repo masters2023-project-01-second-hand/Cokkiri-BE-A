@@ -19,6 +19,24 @@ INSERT INTO location(depth_1, depth_2, depth_3) VALUES
 INSERT INTO my_location(user_id, location_id, is_selected) VALUES (1, 1970, 1), (1, 1971, 0), (1, 1972, 0);
 
 INSERT INTO status(id, name) VALUES (1, "판매중"), (2, "예약중"), (3, "판매완료");
-INSERT INTO category(id, name, icon_name) VALUES (1, "디지털기기", "icon_digital"), (2 , "생활가전", "icon_appliance"), (3 , "가구/인테리어", "icon_furniture"), (4 , "생활/주방", "icon_kitchen"), (5 , "유아동", "icon_baby"), (6 , "유아도서", "icon_book"), (7 , "여성의류", "icon_clothes"), (8 , "여성잡화", "icon_accessories"), (9 , "남성패션/잡화", "icon_man"), (10 , "뷰티/미용", "icon_beauty"), (11 , "스포츠/레저", "icon_sports"), (12 , "취미/게임/음반", "icon_hobby"), (13 , "중고차", "icon_car"), (14 , "티켓/교환권", "icon_ticket"), (15 , "가공식품", "icon_food"), (16 , "반려동물용품", "icon_pet"), (17 , "식물", "icon_plant"), (18 , "기타 중고물품", "icon_etc");
+INSERT INTO category(id, name, icon_name)
+VALUES (1, '디지털기기', 'icon_digital'),
+       (2, '생활가전', 'icon_appliance'),
+       (3, '가구/인테리어', 'icon_furniture'),
+       (4, '생활/주방', 'icon_kitchen'),
+       (5, '유아동', 'icon_baby'),
+       (6, '유아도서', 'icon_book'),
+       (7, '여성의류', 'icon_clothes'),
+       (8, '여성잡화', 'icon_accessories'),
+       (9, '남성패션/잡화', 'icon_man'),
+       (10, '뷰티/미용', 'icon_beauty'),
+       (11, '스포츠/레저', 'icon_sports'),
+       (12, '취미/게임/음반', 'icon_hobby'),
+       (13, '중고차', 'icon_car'),
+       (14, '티켓/교환권', 'icon_ticket'),
+       (15, '가공식품', 'icon_food'),
+       (16, '반려동물용품', 'icon_pet'),
+       (17, '식물', 'icon_plant'),
+       (18, '기타 중고물품', 'icon_etc');
 INSERT INTO item(title, price, seller_id, location_id, status_id, category_id, create_at) VALUES ("갤럭시S3 팔아요 1", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 2", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 3", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 4", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 5", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 6", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 7", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 8", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 9", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 10", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 11", 50000, 2, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 12", 50000, 2, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 13", 50000, 1, 1970, 1, 1, current_timestamp), ("갤럭시S3 팔아요 14", 50000, 1, 1970, 2, 1, current_timestamp), ("갤럭시S3 팔아요 15", 50000, 1, 1970, 2, 1, current_timestamp), ("갤럭시S3 팔아요 16", 50000, 1, 1970, 3, 1, current_timestamp), ("갤럭시S3 팔아요 17", 50000, 1, 1970, 3, 1, current_timestamp);
 INSERT INTO item_content(id, content) VALUES (1, "게시글 내용 : 갤럭시S3 팔아요 1"), (2, "게시글 내용 : 갤럭시S3 팔아요 2"), (3, "게시글 내용 : 갤럭시S3 팔아요 3"), (4, "게시글 내용 : 갤럭시S3 팔아요 4"), (5, "게시글 내용 : 갤럭시S3 팔아요 5"), (6, "게시글 내용 : 갤럭시S3 팔아요 6"), (7, "게시글 내용 : 갤럭시S3 팔아요 7"), (8, "게시글 내용 : 갤럭시S3 팔아요 8"), (9, "게시글 내용 : 갤럭시S3 팔아요 9"), (10, "게시글 내용 : 갤럭시S3 팔아요 10"), (11, "게시글 내용 : 갤럭시S3 팔아요 11"), (12, "게시글 내용 : 갤럭시S3 팔아요 12"), (13, "게시글 내용 : 갤럭시S3 팔아요 13"), (14, "게시글 내용 : 갤럭시S3 팔아요 14"), (15, "게시글 내용 : 갤럭시S3 팔아요 15"), (16, "게시글 내용 : 갤럭시S3 팔아요 16"), (17, "게시글 내용 : 갤럭시S3 팔아요 17");
