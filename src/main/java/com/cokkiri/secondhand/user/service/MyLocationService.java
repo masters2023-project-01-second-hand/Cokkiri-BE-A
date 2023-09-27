@@ -3,6 +3,8 @@ package com.cokkiri.secondhand.user.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,19 +26,25 @@ import com.cokkiri.secondhand.user.repository.MyLocationJpaRepository;
 import com.cokkiri.secondhand.user.repository.UserEntityJpaRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class MyLocationService {
 
+	private static final Logger logger = LoggerFactory.getLogger(MyLocationService.class);
 	private final UserEntityJpaRepository userEntityJpaRepository;
 	private final LocationJpaRepository locationJpaRepository;
 	private final MyLocationJpaRepository myLocationJpaRepository;
 
 	public MyLocationListResponse getMyLocationByUserId(UserInfoForJwt userInfoForJwt) {
 
+		logger.info("userInfoForJwt: " + userInfoForJwt);
+		Long userId = userInfoForJwt.getUserId();
+
 		List<MyLocation> myLocations
-			= myLocationJpaRepository.findAllByUserId(userInfoForJwt.getUserId());
+			= myLocationJpaRepository.findAllByUserId(userId);
 
 		List<MyLocationResponse> mySelectedLocations = myLocations.stream()
 			.filter(myLocation -> !myLocation.isSelected())
