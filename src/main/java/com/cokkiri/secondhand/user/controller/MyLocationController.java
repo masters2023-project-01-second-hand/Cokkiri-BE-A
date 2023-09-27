@@ -2,8 +2,6 @@ package com.cokkiri.secondhand.user.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,22 +18,17 @@ import com.cokkiri.secondhand.user.dto.response.MyLocationResponse;
 import com.cokkiri.secondhand.user.service.MyLocationService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @RestController
-@Slf4j
 public class MyLocationController {
 
-	private static final Logger logger = LoggerFactory.getLogger(MyLocationService.class);
 	private final MyLocationService myLocationService;
 
 	@GetMapping("/api/users/locations")
 	public ResponseEntity<MyLocationListResponse> getMyLocations(HttpServletRequest request) {
 
 		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
-
-		logger.info("userInfoForJwt: {}", userInfoForJwt);
 
 		return ResponseEntity.ok(
 			myLocationService.getMyLocationByUserId(userInfoForJwt)
