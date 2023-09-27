@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
 import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
+import com.cokkiri.secondhand.global.auth.dto.response.LoginResponse;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.list.LoginFailureException;
 import com.cokkiri.secondhand.global.exception.list.NicknameDuplicationException;
@@ -38,7 +39,7 @@ public class GeneralAuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final ImageUploader imageUploader;
 
-	public JwtTokenResponse logIn(GeneralLogInRequest logInRequest) {
+	public LoginResponse logIn(GeneralLogInRequest logInRequest) {
 		GeneralUser user = generalUserJpaRepository.findByUsername(
 			logInRequest.getUsername()
 		).orElseThrow(LoginFailureException::new);
@@ -47,7 +48,10 @@ public class GeneralAuthService {
 			throw new LoginFailureException();
 		}
 
-		return jwtTokenService.issueTokens(UserInfoForJwt.from(user));
+		JwtTokenResponse jwtTokenResponse = jwtTokenService.issueTokens(UserInfoForJwt.from(user));
+
+		return LoginResponse.of(
+			jwtTokenResponse, user.getNickname(), user.getProfileImageUrl());
 	}
 
 	public void signUp(GeneralSignUpRequest signUpRequest, MultipartFile profileImageFile) {
