@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralLogInRequest;
 import com.cokkiri.secondhand.global.auth.dto.request.GeneralSignUpRequest;
-import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
+import com.cokkiri.secondhand.global.auth.dto.response.LoginResponse;
 import com.cokkiri.secondhand.global.auth.infrastructure.JwtAuthHttpResponseManager;
 import com.cokkiri.secondhand.global.auth.service.GeneralAuthService;
 
@@ -26,15 +26,15 @@ public class GeneralAuthController {
 	private final GeneralAuthService generalAuthService;
 
 	@PostMapping("/api/login")
-	public ResponseEntity<JwtTokenResponse> login(
+	public ResponseEntity<LoginResponse> login(
 		@RequestBody @Valid GeneralLogInRequest signInRequest,
 		HttpServletResponse response) {
 
-		JwtTokenResponse jwtTokenResponse = generalAuthService.logIn(signInRequest);
+		LoginResponse loginResponse = generalAuthService.logIn(signInRequest);
 
-		jwtAuthHttpResponseManager.setAuthHttpResponse(response, jwtTokenResponse);
+		jwtAuthHttpResponseManager.setAuthHttpResponse(response, loginResponse.getJwtTokenResponse());
 
-		return ResponseEntity.ok(jwtTokenResponse);
+		return ResponseEntity.ok(loginResponse);
 	}
 
 	@PostMapping("/api/users")
