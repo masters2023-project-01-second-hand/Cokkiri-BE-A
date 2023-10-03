@@ -47,29 +47,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 
-		//HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+		// HttpServletRequest httpServletRequest = (HttpServletRequest)request;
 
-		// if (request.getMethod().equals("OPTIONS")) {
-		// 	return;
-		// }
-		//
-		// if (whiteListCheck(request.getRequestURI())) {
-		// 	filterChain.doFilter(request, response);
-		// 	return;
-		// }
-		//
-		// if (!jwtAuthHttpResponseManager.isContainAccessToken(request)) {
-		//
-		// 	if (publicListCheck(request.getRequestURI())) {
-		// 		UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateGuestUserInfo();
-		// 		request.setAttribute("userInfoForJwt", userInfoForJwt);
-		// 		filterChain.doFilter(request, response);
-		// 		return;
-		// 	}
-		//
-		// 	jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
-		// 	return;
-		// }
+		if (request.getMethod().equals("OPTIONS")) {
+			return;
+		}
+
+		if (whiteListCheck(request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		if (!jwtAuthHttpResponseManager.isContainAccessToken(request)) {
+
+			if (publicListCheck(request.getRequestURI())) {
+				UserInfoForJwt userInfoForJwt = UserInfoForJwt.generateGuestUserInfo();
+				request.setAttribute("userInfoForJwt", userInfoForJwt);
+				filterChain.doFilter(request, response);
+				return;
+			}
+
+			jwtAuthHttpResponseManager.sendNotExistAccessTokenException(response, objectMapper);
+			return;
+		}
 
 		try {
 			String token = jwtAuthHttpResponseManager.getAccessToken(request);
