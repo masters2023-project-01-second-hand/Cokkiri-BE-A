@@ -24,13 +24,15 @@ public class S3ImageUploaderImpl implements ImageUploader {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
+	private static final String DEFAULT_PROFILE_IMAGE = "https://i.imgur.com/qZBYuhk.png";
+
 	private final AmazonS3 amazonS3;
 
 	public String uploadMultiImageFile(MultipartFile multipartFile, ImageType imageType) {
 
 		if (!validateMultiFile(multipartFile)) {
 			if (imageType == ImageType.USER_PROFILE) {
-				return "https://imgur.com/a/2ndgaq9";
+				return DEFAULT_PROFILE_IMAGE;
 			}
 
 			throw new IllegalFileStateException(multipartFile);

@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class ItemListForUserResponse {
+public class ItemForSpecificUserListResponse {
 
-	private List<ItemForUserResponse> items;
+	private List<ItemResponse> items;
 	private Long nextCursor;
 }

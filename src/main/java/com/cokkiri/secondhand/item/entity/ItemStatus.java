@@ -1,5 +1,7 @@
 package com.cokkiri.secondhand.item.entity;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -27,5 +29,9 @@ public class ItemStatus {
 
 	public String getStatusName() {
 		return name.getName();
+	}
+
+	public boolean isSameStatus(ItemStatus itemStatus) {
+		return Objects.equals(this.id, itemStatus.getId());
 	}
 }

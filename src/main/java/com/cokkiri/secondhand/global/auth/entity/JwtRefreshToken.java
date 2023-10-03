@@ -1,6 +1,6 @@
 package com.cokkiri.secondhand.global.auth.entity;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,9 +11,9 @@ import lombok.Getter;
 public class JwtRefreshToken {
 
 	private String refreshToken;
-	private LocalDateTime expirationDateTime;
+	private ZonedDateTime expirationDateTime;
 
-	public static JwtRefreshToken from(String refreshToken, LocalDateTime expirationDateTime) {
+	public static JwtRefreshToken from(String refreshToken, ZonedDateTime expirationDateTime) {
 		return new JwtRefreshToken(
 			refreshToken,
 			expirationDateTime
@@ -21,7 +21,7 @@ public class JwtRefreshToken {
 	}
 
 	public boolean isExpired() {
-		return LocalDateTime.now().isAfter(expirationDateTime);
+		return ZonedDateTime.now().isAfter(expirationDateTime);
 	}
 
 	public boolean equalsRefreshToken(String refreshToken) {
