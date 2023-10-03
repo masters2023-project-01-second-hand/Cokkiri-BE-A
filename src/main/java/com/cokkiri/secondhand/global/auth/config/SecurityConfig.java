@@ -36,32 +36,20 @@ public class SecurityConfig {
 			.csrf().disable()
 			.headers().frameOptions().disable()
 			.and()
-
 			.cors()
 			.and()
-
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
-
 			.authorizeRequests()
-			.antMatchers(
-				"/api/users",
-				"/api/login",
-				"/api/reissue-access-token",
-				"/api/locations",
-				"/api/categories").permitAll() // White URI List
-			.antMatchers(
-				"/api/items").permitAll() // Public URI List
-			.anyRequest().authenticated()
+			.antMatchers("/**").permitAll() // Allow all requests
 			.and()
-
 			.oauth2Login()
 			.successHandler(oAuthLoginSuccessHandler)
 			.failureHandler(oAuthLoginFailureHandler)
 			.userInfoEndpoint()
 			.userService(oAuthService);
 
-		http.addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class);
+		// http.addFilterAfter(jwtAuthorizationFilter, LogoutFilter.class); // Optionally, you can comment out this line if you don't want to use the JWT filter at all.
 
 		return http.build();
 	}

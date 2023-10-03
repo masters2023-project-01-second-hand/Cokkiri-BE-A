@@ -29,7 +29,7 @@ public class CategoryDslRepositoryImpl implements CategoryDslRepository {
 					CategoryResponse.class,
 					category.id,
 					category.name,
-					category.name))
+					category.iconName))
 			.from(category)
 			.fetch();
 	}

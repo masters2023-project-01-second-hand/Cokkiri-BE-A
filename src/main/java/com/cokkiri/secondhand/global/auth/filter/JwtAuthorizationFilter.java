@@ -80,6 +80,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		} catch (Exception e) {
 			jwtAuthHttpResponseManager.sendErrorResponseEntity(response, objectMapper, new RuntimeException(e));
 		}
+
+		// filterChain.doFilter(request, response);
 	}
 
 	private boolean whiteListCheck(String uri) {

@@ -24,4 +24,7 @@ public class Category {
 
 	@Column(name = "name", length = 45, nullable = false)
 	private String name;
+
+	@Column(name = "icon_name", nullable = false)
+	private String iconName;
 }
