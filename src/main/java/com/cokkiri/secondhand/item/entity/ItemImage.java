@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,9 +26,15 @@ public class ItemImage {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "item_id", insertable = false, updatable = false)
+	@JoinColumn(name = "item_id")
 	private Item item;
 
 	@Column(length = 2000)
 	private String url;
+
+	@Builder
+	public ItemImage(Item item, String url) {
+		this.item = item;
+		this.url = url;
+	}
 }
