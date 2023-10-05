@@ -26,7 +26,7 @@ public class S3ImageUploaderImpl implements ImageUploader {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
-	private static final String DEFAULT_PROFILE_IMAGE = "https://i.imgur.com/qZBYuhk.png";
+	private static final String DEFAULT_PROFILE_IMAGE = "https://cokkiri-images-bucker.s3.ap-northeast-2.amazonaws.com/images/default/default_image.png";
 
 	private final AmazonS3 amazonS3;
 
