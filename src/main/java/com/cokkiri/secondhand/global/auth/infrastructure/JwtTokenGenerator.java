@@ -15,6 +15,7 @@ import com.cokkiri.secondhand.global.auth.dto.response.JwtTokenResponse;
 import com.cokkiri.secondhand.global.auth.entity.JwtAccessToken;
 import com.cokkiri.secondhand.global.auth.entity.JwtRefreshToken;
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.global.exception.list.IllegalJwtTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -23,11 +24,9 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
-public class JwtTokenGenerator  {
+public class JwtTokenGenerator {
 
 	private static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("UTC");
 
@@ -82,8 +81,8 @@ public class JwtTokenGenerator  {
 				.getBody();
 
 			return UserInfoForJwt.generateUserInfo(
-				Long.valueOf((String) claims.get("id")),
-				(String) claims.get("userType")
+				Long.valueOf((String)claims.get("id")),
+				(String)claims.get("userType")
 			);
 		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
 			errorMessage = "잘못된 JWT 서명입니다.";
@@ -95,10 +94,7 @@ public class JwtTokenGenerator  {
 			errorMessage = "JWT 토큰이 잘못되었습니다.";
 		}
 
-		// 현재 프론트단에 refresh token 로직이 구현되어 있지 않아 게스트 회원을 반환하도록 변경
-		// throw new IllegalJwtTokenException(errorMessage);
-		log.info(errorMessage);
-		return UserInfoForJwt.generateGuestUserInfo();
+		throw new IllegalJwtTokenException(errorMessage);
 	}
 
 	private JwtAccessToken createAccessToken(UserInfoForJwt user) {
