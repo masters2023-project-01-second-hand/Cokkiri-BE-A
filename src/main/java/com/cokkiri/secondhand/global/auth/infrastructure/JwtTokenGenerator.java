@@ -40,8 +40,8 @@ public class JwtTokenGenerator {
 	public JwtTokenGenerator(
 		MemoryJwtRepository memoryJwtRepository,
 		@Value("${jwt.secret}") String secret,
-		@Value("${jwt.access.expiration-time-in-seconds}") Long accessTokenExpirationTime,
-		@Value("${jwt.refresh.expiration-time-in-seconds}") Long refreshTokenExpirationTime,
+		@Value("${jwt.access.expiration-time-in-milli-seconds}") Long accessTokenExpirationTime,
+		@Value("${jwt.refresh.expiration-time-in-milli-seconds}") Long refreshTokenExpirationTime,
 		@Value("${jwt.access.subject}") String accessSubject,
 		@Value("${jwt.access.subject}") String refreshSubject) {
 
