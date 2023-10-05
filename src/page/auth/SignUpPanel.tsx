@@ -132,15 +132,14 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
     }
 
     const res = await singup(formData);
-    console.log(res);
     // TODO : 에러 예외 처리
     if (res.status === 201) {
-      showToast({ type: 'success', message: '회원가입 성공!' });
+      showToast({ mode: 'success', message: '회원가입 성공!' });
       closePanel();
     }
   };
 
-  const setSignUpLocation = (locationId: number, locationName: string) => {
+  const onSetSignUpLocation = (locationId: number, locationName: string) => {
     setLocation({ id: locationId, name: locationName });
     setIsModalOpen(false);
   };
@@ -186,6 +185,7 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
           onChangeId={onChangeId}
           onChangePassword={onChangePassword}
           onChangeNickname={onChangeNickname}
+          onSubmit={submit}
         />
         {location ? (
           <Button
@@ -195,13 +195,7 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
             align="space-between"
           >
             {location.name}
-            <Icon
-              name="pencil"
-              color="accentText"
-              onClick={() => {
-                console.log('삭제할까요?');
-              }}
-            />
+            <Icon name="pencil" color="accentText" />
           </Button>
         ) : (
           <Button
@@ -219,7 +213,7 @@ export function SignUpPanel({ closePanel }: SignUpPanelProps) {
         <SignUpLocationModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          setSignUpLocation={setSignUpLocation}
+          onSetSignUpLocation={onSetSignUpLocation}
         />
       )}
     </Div>

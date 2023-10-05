@@ -14,6 +14,7 @@ import {
   getUserLocations,
   selectUserLocation,
 } from '../fetchers/locationFetcher';
+import { ITEMS_QUERY_KEY } from './useItemQuery';
 
 const USER_LOCATION_QUERY_KEY = 'userLocations';
 const LOCATION_QUERY_KEY = 'locations';
@@ -68,7 +69,7 @@ export const useAddUserLocation = () => {
       const statueCode = error?.response?.status;
       if (statueCode === 500) {
         showToast({
-          type: 'error',
+          mode: 'error',
           message: '서버에서 요청이 제대로 처리되지 못했습니다.',
         });
       }
@@ -117,6 +118,7 @@ export const useSelectUserLocation = () => {
           };
         }
       );
+      queryClient.invalidateQueries([ITEMS_QUERY_KEY]);
     },
   });
 };

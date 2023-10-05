@@ -6,18 +6,11 @@ import { useToastStore } from '../stores/useToastStore';
 export function ProtectedRoute() {
   const currentLocation = useLocation();
   const showToast = useToastStore(state => state.showToast);
-  const { accessToken, refreshToken, nickname, profileImageUrl } =
-    useAuthStore();
-
-  const isLogin =
-    accessToken !== '' &&
-    refreshToken !== '' &&
-    nickname !== '' &&
-    profileImageUrl !== '';
+  const isLogin = useAuthStore(state => state.isLogin);
 
   useEffect(() => {
     if (!isLogin) {
-      showToast({ type: 'warning', message: '로그인 후 이용해 주세요' });
+      showToast({ mode: 'warning', message: '로그인 후 이용해 주세요' });
     }
   });
 
