@@ -20,6 +20,7 @@ import javax.persistence.TemporalType;
 import com.cokkiri.secondhand.user.entity.UserEntity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -69,6 +70,16 @@ public class Item {
 	@OneToMany
 	@JoinColumn(name = "item_id")
 	private List<ItemImage> itemImages = new ArrayList<ItemImage>();
+
+	@Builder
+	public Item(String title, Long price, UserEntity seller, Location location, ItemStatus status, Category category) {
+		this.title = title;
+		this.price = price;
+		this.seller = seller;
+		this.location = location;
+		this.status = status;
+		this.category = category;
+	}
 
 	public Long findSellerId() {
 		return seller.getId();

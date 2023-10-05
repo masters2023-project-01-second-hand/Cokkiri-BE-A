@@ -2,10 +2,12 @@ package com.cokkiri.secondhand.global.image.infrastructure;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -17,14 +19,14 @@ import com.cokkiri.secondhand.global.exception.list.IllegalFileStateException;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class S3ImageUploaderImpl implements ImageUploader {
 
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
-	private static final String DEFAULT_PROFILE_IMAGE = "https://i.imgur.com/qZBYuhk.png";
+	private static final String DEFAULT_PROFILE_IMAGE = "https://cokkiri-images-bucker.s3.ap-northeast-2.amazonaws.com/images/default/default_image.png";
 
 	private final AmazonS3 amazonS3;
 
@@ -67,5 +69,16 @@ public class S3ImageUploaderImpl implements ImageUploader {
 			|| multipartFile.getOriginalFilename() == null
 			|| multipartFile.getOriginalFilename().isBlank()
 			|| multipartFile.getSize() == 0);
+	}
+
+	public List<String> uploadMultiImageFiles(List<MultipartFile> multipartFiles, ImageType imageType) {
+
+		List<String> uploadedImageUrls = new ArrayList<>();
+
+		multipartFiles.stream()
+			.map(file -> uploadMultiImageFile(file, imageType))
+			.forEach(uploadedImageUrls::add);
+
+		return uploadedImageUrls;
 	}
 }

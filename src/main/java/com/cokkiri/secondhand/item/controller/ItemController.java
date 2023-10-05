@@ -1,20 +1,28 @@
 package com.cokkiri.secondhand.item.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
+import com.cokkiri.secondhand.item.dto.request.ItemCreateRequest;
+import com.cokkiri.secondhand.item.dto.response.ItemCreateResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemFavoriteResponse;
-import com.cokkiri.secondhand.item.dto.response.ItemForSpecificUserListResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemForAnyOneListResponse;
+import com.cokkiri.secondhand.item.dto.response.ItemForSpecificUserListResponse;
 import com.cokkiri.secondhand.item.service.ItemService;
 
 import lombok.RequiredArgsConstructor;
@@ -66,5 +74,16 @@ public class ItemController {
 		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
 
 		return ResponseEntity.ok(itemService.switchFavorite(userInfoForJwt, itemId));
+	}
+
+	@PostMapping("/api/items")
+	public ResponseEntity<ItemCreateResponse> addItem(
+		HttpServletRequest request,
+		@RequestPart(required = false) List<MultipartFile> imageFiles,
+		@RequestPart("item") @Valid ItemCreateRequest itemCreateRequest) {
+
+		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
+
+		return ResponseEntity.ok(itemService.createItem(userInfoForJwt, imageFiles, itemCreateRequest));
 	}
 }

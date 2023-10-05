@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,10 @@ public class ItemContent {
 
 	@Lob
 	private String content;
+
+	@Builder
+	public ItemContent(Item item, String content) {
+		this.item = item;
+		this.content = content;
+	}
 }

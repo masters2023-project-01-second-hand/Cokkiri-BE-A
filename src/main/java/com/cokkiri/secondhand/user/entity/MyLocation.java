@@ -48,4 +48,13 @@ public class MyLocation {
 	public void chooseMyLocation() {
 		this.selected = true;
 	}
+
+	/**
+	 * MyLocation의 id 말고, MyLocation에 해당하는 Location의 id값 반환
+	 * @return MyLocation에 해당하는 Location의 id값 반환
+	 */
+	public Long findLocationId() {
+		return this.location.getId();
+	}
+
 }
