@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -33,9 +34,15 @@ public class AwsS3Config {
 
 	@Bean
 	public AmazonS3 amazonS3() {
+		ClientConfiguration clientConfiguration = new ClientConfiguration();
+		clientConfiguration.setConnectionTimeout(10_000);
+		clientConfiguration.setRequestTimeout(10_000);
+		clientConfiguration.setMaxErrorRetry(3);
+
 		return AmazonS3ClientBuilder.standard()
 			.withRegion(region)
 			.withCredentials(new AWSStaticCredentialsProvider(awsCredentialsProvider()))
+			.withClientConfiguration(clientConfiguration)
 			.build();
 	}
 }
