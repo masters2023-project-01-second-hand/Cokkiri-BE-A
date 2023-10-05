@@ -6,12 +6,15 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.global.exception.list.NotFoundCategoryException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundItemException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundLocationException;
 import com.cokkiri.secondhand.global.exception.list.NotFoundUserException;
+import com.cokkiri.secondhand.item.dto.request.ItemCreateRequest;
+import com.cokkiri.secondhand.item.dto.response.ItemCreateResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemDetailResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemFavoriteResponse;
 import com.cokkiri.secondhand.item.dto.response.ItemForAnyOneListResponse;
@@ -52,6 +55,7 @@ public class ItemService {
 	private final ItemStatusJpaRepository itemStatusJpaRepository;
 
 	private final ItemMetadataService itemMetadataService;
+	private final ItemCreateService itemCreateService;
 
 	@Transactional(readOnly = true)
 	public ItemForAnyOneListResponse getItems(Long cursorId, Long categoryId, Pageable pageable, UserInfoForJwt userInfoForJwt) {
@@ -172,5 +176,12 @@ public class ItemService {
 
 	private boolean existFavorite(UserInfoForJwt userInfo, Long itemId) {
 		return favoriteJpaRepository.existsByUserIdAndItemId(userInfo.getUserId(), itemId);
+	}
+
+	public ItemCreateResponse createItem(
+		UserInfoForJwt userInfo,
+		List<MultipartFile> imageFiles, ItemCreateRequest itemCreateRequest) {
+
+		return itemCreateService.createItem(userInfo, imageFiles, itemCreateRequest);
 	}
 }
