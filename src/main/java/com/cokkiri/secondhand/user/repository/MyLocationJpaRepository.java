@@ -25,5 +25,5 @@ public interface MyLocationJpaRepository extends JpaRepository<MyLocation, Long>
 	@Query(value = "UPDATE my_location "
 		+ "SET is_selected = false "
 		+ "WHERE user_id = ?1", nativeQuery = true)
-	void updateAllIsSelectedToFalse(Long useId);
+	void updateAllIsSelectedToFalse(Long userId);
 }
