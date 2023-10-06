@@ -43,6 +43,7 @@ public class ItemController {
 
 		UserInfoForJwt userInfoForJwt = (UserInfoForJwt)request.getAttribute("userInfoForJwt");
 
+		logger.info("UserInfoForJwt: {}", userInfoForJwt);
 		logger.info("Items: {}", itemService.getItems(cursorId, categoryId, PageRequest.of(0, 10), userInfoForJwt));
 
 		return ResponseEntity.ok(
