@@ -95,7 +95,7 @@ public class JwtTokenGenerator  {
 			errorMessage = "JWT 토큰이 잘못되었습니다.";
 		}
 
-		// 현재 프론트단에 refresh token 로직이 구현되어 있지 않아 게스트 회원을 반환하도록 변경
+		// 현재 프론트단과 refresh token 로직을 맞춰보지 않아, 토큰 검증 실패시 에러를 발생시키는 대신 게스트 회원을 반환 하도록 임시 변경
 		// throw new IllegalJwtTokenException(errorMessage);
 		log.info(errorMessage);
 		return UserInfoForJwt.generateGuestUserInfo();
