@@ -3,7 +3,9 @@ package com.cokkiri.secondhand.item.dto.response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
+import com.cokkiri.secondhand.global.auth.entity.UserInfoForJwt;
 import com.cokkiri.secondhand.item.entity.Item;
 import com.cokkiri.secondhand.item.entity.ItemImage;
 
@@ -27,9 +29,10 @@ public class ItemResponse {
 	private String statusName;
 	private Long price;
 	private CountDataResponse countData;
+	private Boolean isSeller;
 	private String thumbnailUrl;
 
-	public ItemResponse(Item item) {
+	public ItemResponse(Item item, UserInfoForJwt userInfoForJwt) {
 		this.id = item.getId();
 		this.title = item.getTitle();
 		this.locationName = item.getLocation().getFullName();
@@ -37,12 +40,17 @@ public class ItemResponse {
 		this.statusName = item.getStatus().getStatusName();
 		this.price = item.getPrice();
 		this.countData = CountDataResponse.from(item.getItemMetadata());
+		this.isSeller = isSeller(item, userInfoForJwt);
 		this.thumbnailUrl = extractThumbnailUrl(item);
 	}
 
+	private static boolean isSeller(Item item, UserInfoForJwt userInfoForJwt) {
+		return Objects.equals(item.findSellerId(), userInfoForJwt.getUserId());
+	}
+
 	private static String extractThumbnailUrl(Item item) {
-		List<ItemImage> itemImage =new ArrayList<>();
-		if(item.getItemImages().isEmpty()) {
+		List<ItemImage> itemImage = new ArrayList<>();
+		if (item.getItemImages().isEmpty()) {
 			return null;
 		}
 		return item.getItemImages().get(THUMBNAIL_IMAGE_INDEX).getUrl();
