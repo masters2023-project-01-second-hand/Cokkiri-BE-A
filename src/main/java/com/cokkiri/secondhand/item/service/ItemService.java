@@ -92,16 +92,17 @@ public class ItemService {
 			.orElseThrow(() -> new NotFoundUserException(nickname));
 
 		List<ItemResponse> items;
-
 		Status status = (isSold == null)? null : Status.determineStatusIsSold(isSold);
+
+		UserInfoForJwt userInfo = UserInfoForJwt.generateUserInfo(user.getId(), user.getNickname());
 
 		if (status == null) {
 			items = itemDslRepository.findAllBySellerId(pageable, user.getId(), cursorId).stream()
-				.map(ItemResponseForSpecificUser::from)
+				.map(item -> ItemResponseForSpecificUser.from(item, userInfo))
 				.collect(Collectors.toList());
 		} else {
 			items = itemDslRepository.findAllBySellerIdAndStatusId(pageable, user.getId(), status.getId(), cursorId).stream()
-				.map(ItemResponseForSpecificUser::from)
+				.map(item -> ItemResponseForSpecificUser.from(item, userInfo))
 				.collect(Collectors.toList());
 		}
 

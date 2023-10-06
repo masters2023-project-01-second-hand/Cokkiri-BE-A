@@ -22,7 +22,7 @@ public class ItemResponseForAnyOne extends ItemResponse {
 	}
 
 	private ItemResponseForAnyOne(Item item, UserInfoForJwt userInfoForJwt) {
-		super(item);
+		super(item, userInfoForJwt);
 		this.isSeller = isSeller(item, userInfoForJwt);
 	}
 
